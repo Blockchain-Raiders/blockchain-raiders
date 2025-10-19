@@ -1,5 +1,4 @@
 // pages/index.js
-import FireOverlay from '@/components/FireOverlay';
 import Head from 'next/head';
 import Image from 'next/image';
 import PepeDuelClash from '@/components/PepeDuelClash';
@@ -27,6 +26,7 @@ export default function Home() {
     <div className="relative min-h-screen">
       <Head>
         <title>{title}</title>
+        <link rel="icon" href="/img/favicon.webp" type="image/webp" />
         <meta name="description" content={description} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta property="og:title" content={title} />
@@ -39,7 +39,8 @@ export default function Home() {
         <meta property="twitter:image" content={ogImage} />
         <link rel="preload" as="image" href="/img/torch_bg_4k.png" />
         <link rel="icon" href="/img/favicon.ico" />
-      </Head>  
+      </Head>
+
       {/* Fixed background + gradient stays put while sections scroll */}
       <img
         src="/img/torch_bg_4k.png"
@@ -50,22 +51,26 @@ export default function Home() {
       />
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/70" />
 
-      {/* Snap scroll container */}
-      <div ref={containerRef} className="relative z-10 h-screen overflow-y-auto snap-y snap-mandatory" role="main">
-      <FireOverlay scope="section" z="z-10" density={32} speed={9} />
- {/* SECTION 1: HERO */}
+      {/* Snap scroll container (bind id for the overlay to read scrollTop) */}
+      <div
+        id="mainScroll"
+        ref={containerRef}
+        className="relative z-10 h-screen overflow-y-auto snap-y snap-mandatory"
+        role="main"
+      >
+        {/* SECTION 1: HERO */}
         <section className="svh min-h-screen snap-start flex items-center relative overflow-hidden" aria-label="Hero">
           {/* Fighters behind the hero content */}
-         <PepeDuelClash
-  className="absolute inset-0 z-0"
-  leftSrc="/img/pepeswordknightleftleft.png"
-  rightSrc="/img/pepeswordknightright.png"
-  clashAt={1.1}     // rush-in
-  hold={12}         // keep them in place ~12s
-  retreat={6}       // slow slide off
-  safePercent={18}  // stop before hero content
-  rightNudge={5}    // bring right closer to center
-/>
+          <PepeDuelClash
+            className="absolute inset-0 z-0"
+            leftSrc="/img/pepeswordknightleftleft.png"
+            rightSrc="/img/pepeswordknightright.png"
+            clashAt={1.1}     // rush-in
+            hold={12}         // keep them in place ~12s
+            retreat={6}       // slow slide off
+            safePercent={18}  // stop before hero content
+            rightNudge={5}    // bring right closer to center
+          />
 
           <main className="relative z-10 w-full max-w-6xl mx-auto px-6 py-12 flex flex-col items-center gap-8">
             <HeaderLogo />
@@ -92,26 +97,10 @@ export default function Home() {
         </section>
 
         {/* SECTION 2: LORE */}
-
         <section id="lore" className="svh min-h-screen snap-start flex items-center" aria-label="Our Story">
           <div className="w-full">
             <section className="max-w-4xl mx-auto px-6 pb-24 relative text-center overflow-hidden">
-              {/* floating embers */}
-              <div className="absolute inset-0 pointer-events-none motion-safe:block motion-reduce:hidden">
-                {[...Array(10)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute w-1 h-1 bg-raidGold rounded-full opacity-70"
-                    style={{
-                      left: `${Math.random() * 100}%`,
-                      top: `${Math.random() * 100}%`,
-                      animation: 'floatDrift 6s ease-in-out infinite',
-                      animationDelay: `${i * 0.3}s`,
-                    }}
-                  />
-                ))}
-              </div>
-
+              {/* Removed redundant local floating embers — global overlay handles ambience */}
 
               <h2 className="font-pixel text-raidLime text-2xl mb-6 lore-glow relative z-10">OUR STORY</h2>
 
@@ -132,7 +121,7 @@ export default function Home() {
             </section>
           </div>
         </section>
- 
+
         {/* SECTION 3: MODES */}
         <section className="svh min-h-screen snap-start flex items-center" aria-label="Game Modes">
           <div className="w-full max-w-6xl mx-auto px-6">
