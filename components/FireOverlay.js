@@ -2,34 +2,18 @@
 import { useEffect, useMemo, useRef } from "react";
 
 /**
- * Full-page ember overlay with scroll-reactive parallax and fiery bottom “hearth” glow.
- * - Bind to a scroll container via scrollTargetId (default: "mainScroll")
- * - Plays nicely with CSS scroll-snap (velocity smoothing + anti-spike)
+ * SAFE MODE: Stable embers & scroll-grown hearth glow
+ * - Embers spawn only from bottom, constant upward rise, slight per-ember sway
+ * - No reseeding, no wind, no rAF loops touching embers
+ * - Hearth glow scales/brightens with scroll depth (rAF-throttled on scroll)
  */
 export default function FireOverlay({
-  density = 36,
+  density = 30,          // start conservative; raise to taste
   scope = "page",
   z = "z-10",
-  speed = 10,                 // base rise duration (s) — higher = slower
+  baseSpeed = 11,        // avg seconds per rise loop
   scrollTargetId = "mainScroll",
 }) {
-  const prefersReduced =
-    typeof window !== "undefined" &&
-    window.matchMedia &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  const embers = useMemo(() => {
-    return Array.from({ length: density }).map((_, i) => {
-      const left  = (i * (100 / density) + (i * 13) % 17) % 100;
-      const delay = (i * 0.35) % 8;                // 0..8s stagger
-      const dur   = speed + ((i * 89) % 50) / 10;  // speed..speed+5s
-      const size  = 2 + ((i * 29) % 6);            // 2–8px
-      // warm ember hues (gold/orange/red) — no lime/magenta
-      const hue   = [38, 22, 8][i % 3];            // ~gold→orange→red in HSL
-      return { id: i, left, delay, dur, size, hue };
-    });
-  }, [density, speed]);
-
   const containerClass =
     scope === "page"
       ? `fixed inset-0 pointer-events-none ${z}`
@@ -37,74 +21,59 @@ export default function FireOverlay({
 
   const overlayRef = useRef(null);
 
-  // Scroll-reactive parallax & speed — bound to the snap container
-  useEffect(() => {
-    if (prefersReduced) return;
+  // one-time randomized particles (NO reseeding)
+  const embers = useMemo(() => {
+    const rnd = (a, b) => Math.random() * (b - a) + a;
+    const hues = [38, 22, 8]; // gold/orange/red
+    return Array.from({ length: density }).map((_, i) => {
+      const left = rnd(2, 98);                 // %
+      const size = rnd(2, 7.5);                // px
+      const hue  = hues[i % hues.length];      // distribute hues
+      const delay = rnd(0, 7.5);               // s
+      const dur = Math.max(7, baseSpeed + rnd(-3, 3.5)); // s (bounded)
+      const driftX = (Math.random() < 0.5 ? -1 : 1) * rnd(6, 18); // px
+      const swayDur = rnd(1.2, 2.0);           // s
+      const opacity = rnd(0.75, 0.95);
+      return { id: i, left, size, hue, delay, dur, driftX, swayDur, opacity };
+    });
+  }, [density, baseSpeed]);
 
-    const el = overlayRef.current;
-    if (!el) return;
+  // Hearth glow: grow with scroll (rAF-throttled on scroll only)
+  useEffect(() => {
+    const root = overlayRef.current;
+    if (!root) return;
 
     const target = document.getElementById(scrollTargetId) || window;
-    const getY = () =>
-      target === window ? window.scrollY : /** @type {HTMLElement} */ (target).scrollTop;
+    const getY = () => (target === window ? window.scrollY : target.scrollTop);
+    const getMax = () =>
+      target === window
+        ? Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
+        : Math.max(1, target.scrollHeight - target.clientHeight);
 
-    let raf = 0;
-    let lastY = getY();
-    let lastT = performance.now();
-    let yShift = 0;
-    let vel = 0;         // px/sec (smoothed)
-    let snapDecay = 1.0; // gentle over-slowing during snap jumps
+    let scheduled = false;
+    const update = () => {
+      scheduled = false;
+      const prog = Math.min(1, Math.max(0, getY() / getMax())); // 0..1
+      const sY = 1 + prog * 0.9;   // taller as you go down
+      const sX = 1 + prog * 0.15;  // tiny widen
+      const br = 0.95 + prog * 0.35;
+      root.style.setProperty("--hearthScaleY", sY.toFixed(3));
+      root.style.setProperty("--hearthScaleX", sX.toFixed(3));
+      root.style.setProperty("--hearthBright", br.toFixed(3));
+    };
 
-    let endTimer = 0;
     const onScroll = () => {
-      clearTimeout(endTimer);
-      endTimer = setTimeout(() => {
-        snapDecay = 1.0;
-        el.style.setProperty("--scrollMul", "1.0");
-      }, 300);
-    };
-    (target === window ? window : target).addEventListener("scroll", onScroll, { passive: true });
-
-    const tick = () => {
-      const now = performance.now();
-      const y = getY();
-      const dt = Math.max(16, now - lastT);
-      const instVel = ((y - lastY) / dt) * 1000; // px/sec
-
-      // Low-pass filter velocity
-      vel = vel * 0.9 + instVel * 0.1;
-
-      // Subtle parallax (5% of scroll)
-      yShift = y * 0.05;
-      el.style.transform = `translateY(${yShift}px)`;
-
-      // Map |vel| -> duration multiplier (faster scroll => slower embers)
-      const absV = Math.min(1500, Math.abs(vel)); // clamp spikes
-      let mul = 1.0 + absV / 2500;                // 1.0..1.6
-      mul = Math.min(1.6, mul);
-
-      // If we detect a snap (big instantaneous jump), briefly exaggerate slowing
-      if (Math.abs(instVel) > 1200) {
-        snapDecay = 1.35;
-      } else {
-        snapDecay = snapDecay * 0.92 + 1.0 * 0.08; // ease back toward 1
+      if (!scheduled) {
+        scheduled = true;
+        requestAnimationFrame(update);
       }
-
-      const finalMul = (mul * snapDecay).toFixed(3);
-      el.style.setProperty("--scrollMul", finalMul);
-
-      lastY = y;
-      lastT = now;
-      raf = requestAnimationFrame(tick);
     };
 
-    raf = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(raf);
-      (target === window ? window : target).removeEventListener("scroll", onScroll);
-      clearTimeout(endTimer);
-    };
-  }, [prefersReduced, scrollTargetId]);
+    // initial + listen
+    update();
+    (target === window ? window : target).addEventListener("scroll", onScroll, { passive: true });
+    return () => (target === window ? window : target).removeEventListener("scroll", onScroll);
+  }, [scrollTargetId]);
 
   return (
     <div
@@ -112,77 +81,87 @@ export default function FireOverlay({
       className={containerClass}
       aria-hidden="true"
       style={{
-        transform: prefersReduced ? "translateY(0px)" : undefined,
-        ["--scrollMul"]: prefersReduced ? 1.0 : 1.0,
+        ["--hearthScaleY"]: 1,
+        ["--hearthScaleX"]: 1,
+        ["--hearthBright"]: 1,
       }}
     >
-      {/* 🔥 Bottom "hearth" gradient — warm fire hues */}
-      <div className="absolute inset-x-0 bottom-0 h-[28vh] pointer-events-none">
-        {/* deeper dark base for contrast */}
+      {/* 🔥 Hearth Glow (grows with scroll) */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-[28vh] pointer-events-none origin-bottom"
+        style={{
+          transform: "scaleX(var(--hearthScaleX)) scaleY(var(--hearthScaleY)) translateZ(0)",
+          filter: "brightness(var(--hearthBright))",
+        }}
+      >
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-        {/* ember core glow (hot orange) */}
         <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_50%_100%,rgba(255,90,0,0.35),transparent_65%)]" />
-        {/* molten orange ring */}
         <div className="absolute inset-0 bg-[radial-gradient(70%_50%_at_50%_100%,rgba(255,120,40,0.25),transparent_55%)]" />
-        {/* faint crimson halo */}
         <div className="absolute inset-0 bg-[radial-gradient(60%_40%_at_50%_100%,rgba(200,0,40,0.18),transparent_52%)]" />
       </div>
 
-      {/* Very subtle vertical vignette shimmer */}
+      {/* subtle vignette shimmer */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/0 animate-[pulse_8s_ease-in-out_infinite]" />
 
-      {/* Embers (warm hues only) */}
+      {/* Embers (stable, no reseed) */}
       <div className="absolute inset-0 overflow-hidden">
-        {embers.map(({ id, left, delay, dur, size, hue }) => (
+        {embers.map((e) => (
           <div
-            key={id}
+            key={e.id}
             className="ember"
             style={{
-              left: `${left}%`,
-              width: size,
-              height: size,
-              ["--emberDelay"]: `${delay}s`,
-              ["--emberDur"]: `${dur}s`,
-              backgroundColor: `hsl(${hue}, 100%, 60%)`,
-              boxShadow: `0 0 6px 2px hsl(${hue}, 100%, 70%)`,
+              left: `${e.left}%`,
+              width: e.size,
+              height: e.size,
+              opacity: e.opacity,
+              // constants per ember (no changes after mount)
+              ["--emberDelay"]: `${e.delay}s`,
+              ["--emberDur"]: `${e.dur}s`,
+              ["--driftX"]: `${e.driftX}px`,
+              ["--swayDur"]: `${e.swayDur}s`,
+              backgroundColor: `hsl(${e.hue}, 100%, 60%)`,
+              boxShadow: `0 0 6px 2px hsl(${e.hue}, 100%, 70%)`,
             }}
-          />
+          >
+            <div className="ember__sway" />
+          </div>
         ))}
       </div>
 
       <style jsx>{`
         .ember {
           position: absolute;
-          bottom: -8px; /* spawn just below bottom edge */
+          bottom: -10px;        /* always spawn from bottom */
           border-radius: 9999px;
-          opacity: 0.85;
           will-change: transform, opacity;
-          animation: emberRise calc(var(--emberDur) * var(--scrollMul))
-            linear var(--emberDelay) infinite;
+          animation: emberRise var(--emberDur) linear var(--emberDelay) infinite;
+          transform: translateZ(0);
+        }
+
+        .ember__sway {
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          animation: emberSway var(--swayDur) ease-in-out 0s infinite alternate;
+          background: inherit;
+          box-shadow: inherit;
+          transform: translateZ(0);
         }
 
         @keyframes emberRise {
-          0% {
-            transform: translateY(0vh) scale(0.6);
-            opacity: 0;
-          }
-          10% {
-            opacity: 0.95;
-          }
-          80% {
-            opacity: 0.85;
-          }
-          100% {
-            transform: translateY(-110vh) scale(1.3);
-            opacity: 0;
-          }
+          0%   { transform: translateY(0vh) scale(0.7);  opacity: 0; }
+          12%  { opacity: 0.95; }
+          88%  { opacity: 0.85; }
+          100% { transform: translateY(-112vh) scale(1.25); opacity: 0; }
         }
 
-        /* Reduced motion: constant timing */
+        @keyframes emberSway {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(var(--driftX)); }
+        }
+
         @media (prefers-reduced-motion: reduce) {
-          .ember {
-            animation-duration: var(--emberDur);
-          }
+          .ember__sway { animation: none; }
         }
       `}</style>
     </div>
