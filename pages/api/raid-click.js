@@ -1,56 +1,79 @@
 // pages/api/raid-click.js
 import { createClient } from '@supabase/supabase-js';
 
+// ✅ Force Node runtime so Buffer/base64 etc. are available
+export const config = { runtime: 'nodejs' };
+
 const URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-// Accept either env name so your current Vercel setup works
+// Accept either env var name so your current Vercel setup works
 const SERVICE_ROLE =
   process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.SUPABASE_SERVICE_ROLE;
+  process.env.SUPABASE_SERVICE_ROLE ||
+  '';
 
 const KEY = 'raid_clicks_global';
 
-function noStore(res) {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+function send(res, status, obj) {
+  try {
+    res.status(status);
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  } catch {}
+  res.end(JSON.stringify(obj));
 }
 
-function wrongKeyJson(res, decodedRole) {
-  return res.status(500).json({
-    code: 'WRONG_KEY',
-    message:
-      'You provided the ANON key. Paste the SERVICE ROLE key into SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_SERVICE_ROLE).',
-    details: { decodedRole },
-  });
+function decodeRole(token) {
+  try {
+    const part = token.split('.')[1];
+    if (!part) return null;
+    const json = Buffer.from(part, 'base64url').toString('utf8');
+    return JSON.parse(json)?.role ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export default async function handler(req, res) {
-  noStore(res);
+  const diag = req.query.diag === '1';
+
+  // Quick diagnostics snapshot
+  const diagInfo = {
+    urlPresent: !!URL,
+    serviceVarPresent: !!SERVICE_ROLE,
+    serviceLen: SERVICE_ROLE.length,
+    decodedRole: decodeRole(SERVICE_ROLE), // should be "service_role"
+    method: req.method,
+  };
 
   if (!URL || !SERVICE_ROLE) {
-    return res.status(500).json({
+    return send(res, 500, {
+      ok: false,
       code: 'MISSING_ENVS',
       message:
         'Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_SERVICE_ROLE) in this environment.',
+      diag: diag ? diagInfo : undefined,
     });
   }
 
-  // Detect anon key mistake
-  try {
-    const part = SERVICE_ROLE.split('.')[1];
-    if (part) {
-      const decoded = JSON.parse(Buffer.from(part, 'base64url').toString('utf8'));
-      if (decoded?.role !== 'service_role') return wrongKeyJson(res, decoded?.role || null);
-    }
-  } catch {
-    // ignore
+  // Warn if the wrong key is set
+  const role = diagInfo.decodedRole;
+  if (role && role !== 'service_role') {
+    return send(res, 500, {
+      ok: false,
+      code: 'WRONG_KEY',
+      message:
+        'You provided the ANON key. Paste the SERVICE ROLE key into SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_SERVICE_ROLE).',
+      diag: diag ? diagInfo : undefined,
+    });
   }
 
   const supabase = createClient(URL, SERVICE_ROLE, { auth: { persistSession: false } });
 
   try {
     if (req.method === 'GET') {
+      // Read current total (table may not exist yet)
       const { data, error } = await supabase
         .from('counters')
         .select('total')
@@ -58,63 +81,94 @@ export default async function handler(req, res) {
         .maybeSingle();
 
       if (error) {
-        return res.status(500).json({ code: 'READ_FAILED', message: error.message });
-      }
-      return res.status(200).json({ total: data?.total ?? 0 });
-    }
-
-    if (req.method === 'POST') {
-      // 1) Try atomic RPC increment
-      const { data, error } = await supabase.rpc('raid_click_increment', { p_key: KEY });
-
-      if (!error) {
-        return res.status(200).json({ total: Number(data) });
+        return send(res, 500, {
+          ok: false,
+          code: 'READ_FAILED',
+          message: error.message,
+          diag: diag ? diagInfo : undefined,
+        });
       }
 
-      // 2) If RPC missing, do a safe two-step fallback (ensure row, then increment)
-      if (/does not exist|function/i.test(error.message)) {
-        // ensure row exists
-        const { error: upsertErr } = await supabase
-          .from('counters')
-          .upsert({ k: KEY, total: 0 }, { onConflict: 'k' });
-        if (upsertErr) {
-          return res.status(500).json({ code: 'UPSERT_FAILED', message: upsertErr.message });
-        }
-
-        // read current
-        const { data: current, error: readErr } = await supabase
-          .from('counters')
-          .select('total')
-          .eq('k', KEY)
-          .single();
-        if (readErr) {
-          return res.status(500).json({ code: 'READ_AFTER_UPSERT_FAILED', message: readErr.message });
-        }
-
-        // write incremented
-        const newTotal = (current?.total ?? 0) + 1;
-        const { data: updated, error: writeErr } = await supabase
-          .from('counters')
-          .update({ total: newTotal })
-          .eq('k', KEY)
-          .select('total')
-          .single();
-        if (writeErr) {
-          return res.status(500).json({ code: 'WRITE_FAILED', message: writeErr.message });
-        }
-
-        return res.status(200).json({ total: updated.total });
-      }
-
-      // Other errors
-      return res.status(500).json({
-        code: 'INCREMENT_FAILED',
-        message: error.message || 'Unknown increment error',
+      return send(res, 200, {
+        ok: true,
+        total: data?.total ?? 0,
+        diag: diag ? diagInfo : undefined,
       });
     }
 
-    return res.status(405).json({ code: 'METHOD_NOT_ALLOWED', message: 'Use GET or POST' });
+    if (req.method === 'POST') {
+      // Try RPC first; if missing, fall back to upsert + read + write
+      const rpc = await supabase.rpc('raid_click_increment', { p_key: KEY });
+      if (!rpc.error && typeof rpc.data !== 'undefined') {
+        return send(res, 200, {
+          ok: true,
+          total: Number(rpc.data),
+          used: 'rpc',
+          diag: diag ? diagInfo : undefined,
+        });
+      }
+
+      // Fallback path (works without the function)
+      // Ensure row
+      const up = await supabase
+        .from('counters')
+        .upsert({ k: KEY, total: 0 }, { onConflict: 'k' });
+      if (up.error) {
+        return send(res, 500, {
+          ok: false,
+          code: 'UPSERT_FAILED',
+          message: up.error.message,
+          diag: diag ? diagInfo : undefined,
+        });
+      }
+
+      // Read current
+      const rd = await supabase
+        .from('counters')
+        .select('total')
+        .eq('k', KEY)
+        .single();
+      if (rd.error) {
+        return send(res, 500, {
+          ok: false,
+          code: 'READ_AFTER_UPSERT_FAILED',
+          message: rd.error.message,
+          diag: diag ? diagInfo : undefined,
+        });
+      }
+
+      // Increment and write
+      const newTotal = (rd.data?.total ?? 0) + 1;
+      const wr = await supabase
+        .from('counters')
+        .update({ total: newTotal })
+        .eq('k', KEY)
+        .select('total')
+      .single();
+      if (wr.error) {
+        return send(res, 500, {
+          ok: false,
+          code: 'WRITE_FAILED',
+          message: wr.error.message,
+          diag: diag ? diagInfo : undefined,
+        });
+      }
+
+      return send(res, 200, {
+        ok: true,
+        total: wr.data.total,
+        used: 'fallback',
+        diag: diag ? diagInfo : undefined,
+      });
+    }
+
+    return send(res, 405, { ok: false, code: 'METHOD_NOT_ALLOWED', message: 'Use GET or POST' });
   } catch (e) {
-    return res.status(500).json({ code: 'SERVER_ERROR', message: e?.message || 'Unknown error' });
+    return send(res, 500, {
+      ok: false,
+      code: 'SERVER_ERROR',
+      message: e?.message || 'Unknown error',
+      diag: diag ? diagInfo : undefined,
+    });
   }
 }
