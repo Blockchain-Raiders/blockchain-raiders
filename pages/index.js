@@ -27,7 +27,9 @@ export default function Home() {
 
   // Card shell
   const CardShell = ({ children, className = '' }) => (
-    <div className={`p-4 rounded-xl border border-white/12 bg-transparent text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-raidMagenta/50 shadow-[0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.35)] ${className}`}>
+    <div
+      className={`p-4 rounded-xl border border-white/12 bg-transparent text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-raidMagenta/50 shadow-[0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.35)] ${className}`}
+    >
       {children}
     </div>
   );
@@ -92,7 +94,10 @@ export default function Home() {
         role="main"
       >
         {/* HERO */}
-        <section className="svh min-h-screen snap-start flex items-center relative overflow-hidden" aria-label="Hero">
+        <section
+          className="svh min-h-screen snap-start flex items-center relative overflow-hidden"
+          aria-label="Hero"
+        >
           <PepeDuelClash
             className="absolute inset-0 z-0"
             leftSrc="/img/pepeswordknightleftleft.png"
@@ -115,6 +120,8 @@ export default function Home() {
             <div className="flex flex-col items-center gap-4">
               <Countdown target={new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString()} />
               <ReadyRaidButton />
+
+             
             </div>
 
             <div className="mt-4 flex items-center gap-3" aria-hidden="true">
@@ -128,11 +135,12 @@ export default function Home() {
           </main>
         </section>
 
-        {/* HOW TO PLAY (expanded layout you added) */}
-        {/* — leave your large version here — */}
-
         {/* MODES + FAIRNESS */}
-        <section id="modes" className="svh min-h-screen snap-start flex items-center" aria-label="Game Modes & Fairness">
+        <section
+          id="modes"
+          className="svh min-h-screen snap-start flex items-center"
+          aria-label="Game Modes & Fairness"
+        >
           <div className="w-full max-w-6xl mx-auto px-6">
             <h2 className="font-pixel text-raidLime text-2xl mb-3 lore-glow text-center">
               GAME MODES & PROVABLE FAIRNESS
@@ -158,8 +166,7 @@ export default function Home() {
               <h3 className="font-pixel text-raidLime text-xl mb-3 lore-glow">PROVABLE FAIRNESS</h3>
               <p className="font-ui text-raidText/80 mb-4 text-sm">
                 Each round uses a verifiable <strong>server seed</strong>, <strong>client seed</strong>, and{' '}
-                <strong>nonce</strong>. The server seed is hashed before play and revealed after, so anyone can
-                verify fairness.
+                <strong>nonce</strong>. The server seed is hashed before play and revealed after, so anyone can verify fairness.
               </p>
               <CardShell className="inline-block text-left">
                 <div className="font-mono text-raidText/70 text-xs">
@@ -214,13 +221,27 @@ export default function Home() {
               Follow the campaign, claim early relics, and be first to play.
             </p>
             <div className="flex items-center justify-center gap-6">
-              <a href="https://discord.gg/3xUCP2nH" target="_blank" rel="noreferrer" className="font-pixel text-raidGold hover:neon">Discord</a>
-              <a href="https://t.me/+2XQ3CRHbRGc4YmY0" target="_blank" rel="noreferrer" className="font-pixel text-raidGold hover:neon">Telegram</a>
-              <a href="/hub" className="font-pixel text-raidGold hover:neon">Game Hub</a>
+              <a
+                href="https://discord.gg/3xUCP2nH"
+                target="_blank"
+                rel="noreferrer"
+                className="font-pixel text-raidGold hover:neon"
+              >
+                Discord
+              </a>
+              <a
+                href="https://t.me/+2XQ3CRHbRGc4YmY0"
+                target="_blank"
+                rel="noreferrer"
+                className="font-pixel text-raidGold hover:neon"
+              >
+                Telegram
+              </a>
+              <a href="/hub" className="font-pixel text-raidGold hover:neon">
+                Game Hub
+              </a>
             </div>
-            <div className="mt-10 text-raidText/50 text-xs">
-              © 2025 Blockchain Raiders — Built on Solana
-            </div>
+            <div className="mt-10 text-raidText/50 text-xs">© 2025 Blockchain Raiders — Built on Solana</div>
           </footer>
         </section>
       </div>

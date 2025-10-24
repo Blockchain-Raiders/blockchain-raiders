@@ -1,70 +1,118 @@
-import { useEffect, useState } from 'react';
+// components/ReadyRaidButton.jsx
+import { useEffect, useState, useCallback } from 'react';
 
-export default function ReadyRaidButton({
-  apiPath = '/api/raid-click',
-  clickedKey = 'raid_clicked_once',
-}) {
-  const [count, setCount] = useState(0);
-  const [clicked, setClicked] = useState(false);
-  const [loading, setLoading] = useState(true);
+const KEY_LOCAL = 'raid:clicked:v2'; // bump this key if you need to reset all users
 
+async function apiGet(path) {
+  const res = await fetch(path, {
+    method: 'GET',
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+      Pragma: 'no-cache',
+    },
+  });
+  if (!res.ok) throw new Error(`GET ${path} failed: ${res.status}`);
+  return res.json();
+}
+
+async function apiPost(path) {
+  const res = await fetch(path, {
+    method: 'POST',
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+      Pragma: 'no-cache',
+    },
+  });
+  if (!res.ok) throw new Error(`POST ${path} failed: ${res.status}`);
+  return res.json();
+}
+
+export default function ReadyRaidButton() {
+  const [total, setTotal] = useState(null);      // null while loading
+  const [clicked, setClicked] = useState(false); // local guard
+  const [busy, setBusy] = useState(false);       // network in-flight
+  const [error, setError] = useState('');
+
+  // Dev helper: add "?resetRaid=1" to URL to clear the guard
   useEffect(() => {
-    let mounted = true;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('resetRaid') === '1') {
+      localStorage.removeItem(KEY_LOCAL);
+    }
+    setClicked(!!localStorage.getItem(KEY_LOCAL));
+  }, []);
+
+  // Load current total
+  useEffect(() => {
+    let cancelled = false;
     (async () => {
       try {
-        const has = typeof window !== 'undefined' && localStorage.getItem(clickedKey) === '1';
-        if (has) setClicked(true);
-        const r = await fetch(apiPath);
-        const { total } = await r.json();
-        if (mounted) setCount(total || 0);
-      } catch (_) {}
-      if (mounted) setLoading(false);
+        setError('');
+        const data = await apiGet('/api/raid-click');
+        if (!cancelled) setTotal(typeof data.total === 'number' ? data.total : 0);
+      } catch (e) {
+        console.error(e);
+        if (!cancelled) {
+          setError('Could not load total.');
+          setTotal(0); // fallback display
+        }
+      }
     })();
-    return () => { mounted = false; };
-  }, [apiPath, clickedKey]);
+    return () => { cancelled = true; };
+  }, []);
 
-  const onClick = async () => {
-    if (clicked) return;
-    setClicked(true);
-    localStorage.setItem(clickedKey, '1');
+  const onClick = useCallback(async () => {
+    if (busy || clicked) return;
     try {
-      const r = await fetch(apiPath, { method: 'POST' });
-      const { total } = await r.json();
-      setCount(total || 0);
-    } catch (_) {
-      setCount((c) => c + 1); // optimistic fallback
+      setBusy(true);
+      setError('');
+      const data = await apiPost('/api/raid-click');
+      const next = typeof data.total === 'number' ? data.total : (total ?? 0) + 1;
+      setTotal(next);
+      setClicked(true);
+      localStorage.setItem(KEY_LOCAL, '1');
+    } catch (e) {
+      console.error(e);
+      setError('Could not record click.');
+    } finally {
+      setBusy(false);
     }
-  };
+  }, [busy, clicked, total]);
+
+  // UX text
+  const title = 'READY TO $RAID! ✅';
+  const sub =
+    total === null
+      ? 'Loading…'
+      : `Raiders ready: ${total}`;
 
   return (
-    <div className="flex flex-col items-center gap-3 mt-2">
+    <div className="flex flex-col items-center gap-2 pointer-events-auto">
       <button
         onClick={onClick}
-        disabled={loading || clicked}
-        className={[
-          'relative font-pixel text-xl md:text-2xl uppercase tracking-wider transition-transform duration-150',
-          'px-10 py-5 border-4 rounded-lg',
-          clicked
-            ? 'border-raidLime bg-raidLime/10 text-raidLime cursor-default'
-            : 'border-raidLime bg-raidLime text-black hover:scale-[1.05] active:scale-[0.98] hover:shadow-[0_0_24px_rgba(0,255,160,0.6)]',
-          'shadow-[0_3px_0_rgba(0,0,0,0.4)]',
-        ].join(' ')}
-        style={{
-          fontSmooth: 'never',
-          WebkitFontSmoothing: 'none',
-          imageRendering: 'pixelated',
-          boxShadow: clicked
-            ? '0 0 0 2px rgba(0,255,160,0.5) inset'
-            : '0 0 12px rgba(0,255,160,0.7), 0 4px 12px rgba(0,0,0,0.5)',
-        }}
-        aria-pressed={clicked}
+        disabled={busy || clicked}
+        className={`font-pixel px-4 py-2 rounded-lg border transition
+          ${clicked ? 'border-raidLime/40 text-raidLime/60 cursor-not-allowed' : 'border-raidLime text-raidLime hover:bg-raidLime/10'}
+        `}
+        aria-disabled={busy || clicked}
       >
-        {clicked ? 'READY TO $RAID! ✅' : 'READY TO $RAID!'}
+        {title}
       </button>
 
-      <div className="font-pixel text-sm text-raidText/70 tracking-wide">
-        Raiders ready: <span className="text-raidLime font-semibold text-lg">{count}</span>
+      <div className="text-xs font-ui text-raidText/80">
+        {sub}
       </div>
+
+      {error && (
+        <div className="text-[11px] text-raidMagenta/90 mt-1">
+          {error}
+        </div>
+      )}
+
+      {/* Dev helper reset link (remove in prod if you want) */}
+      {!clicked && (
+        <div className="sr-only">You can append ?resetRaid=1 to the URL to reset the local guard.</div>
+      )}
     </div>
   );
 }

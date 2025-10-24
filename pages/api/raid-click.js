@@ -1,49 +1,69 @@
 // pages/api/raid-click.js
 import { createClient } from '@supabase/supabase-js';
 
-const url = process.env.SUPABASE_URL;
-const serviceKey = process.env.SUPABASE_SERVICE_KEY;
+const URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const KEY = 'raid_clicks_global';
 
-const supabase = createClient(url, serviceKey, { auth: { persistSession: false } });
-
-// safe atomic increment
-async function incrementCounter() {
-  // upsert row, then increment atomically using a single RPC-style update
-  const { error: upErr } = await supabase
-    .from('counters')
-    .upsert({ k: KEY, total: 0 }, { onConflict: 'k' });
-  if (upErr) throw upErr;
-
-  const { data, error } = await supabase
-    .from('counters')
-    .update({ total: supabase.rpc }) // placeholder to avoid accidental copy
-    .select();
-  // The SDK can’t do arithmetic in update; use a SQL function instead:
+function noStore(res) {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
 }
 
 export default async function handler(req, res) {
+  noStore(res);
+
+  if (!URL || !SERVICE_ROLE) {
+    console.error('[raid-click] Missing envs:', { hasUrl: !!URL, hasService: !!SERVICE_ROLE });
+    return res.status(500).json({
+      code: 'MISSING_ENVS',
+      message: 'Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in your environment.',
+    });
+  }
+
+  const supabase = createClient(URL, SERVICE_ROLE, { auth: { persistSession: false } });
+
   try {
     if (req.method === 'GET') {
       const { data, error } = await supabase
         .from('counters')
         .select('total')
         .eq('k', KEY)
-        .single();
-      if (error && error.code !== 'PGRST116') throw error; // not found
+        .maybeSingle();
+
+      if (error) {
+        console.error('[raid-click][GET] supabase error:', error);
+        return res.status(500).json({ code: 'READ_FAILED', message: error.message });
+      }
+
       return res.status(200).json({ total: data?.total ?? 0 });
     }
 
     if (req.method === 'POST') {
-      // use a Postgres function for atomic increment
+      // Atomic server-side increment via RPC (must exist — see SQL in Step 2)
       const { data, error } = await supabase.rpc('raid_click_increment', { p_key: KEY });
-      if (error) throw error;
-      return res.status(200).json({ total: data });
+
+      if (error) {
+        console.error('[raid-click][POST] supabase error:', error);
+        const code = /does not exist|function/i.test(error.message) ? 'RPC_MISSING' : 'INCREMENT_FAILED';
+        return res.status(500).json({
+          code,
+          message:
+            code === 'RPC_MISSING'
+              ? 'Missing SQL function raid_click_increment. Run the SQL from the setup step.'
+              : error.message,
+        });
+      }
+
+      // data is the new total (bigint) returned by the function
+      return res.status(200).json({ total: Number(data) });
     }
 
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ code: 'METHOD_NOT_ALLOWED', message: 'Use GET or POST' });
   } catch (e) {
-    console.error(e);
-    return res.status(500).json({ error: 'Server error' });
+    console.error('[raid-click] unexpected error:', e);
+    return res.status(500).json({ code: 'SERVER_ERROR', message: e?.message || 'Unknown error' });
   }
 }
