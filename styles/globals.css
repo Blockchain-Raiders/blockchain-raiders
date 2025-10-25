@@ -1,132 +1,210 @@
+/* === Google Fonts (must be first) === */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600&display=swap');
+
+/* === Tailwind Layers === */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@media (max-width: 640px) {
-  .btn-pixel { border-width: 3px; }
-  .input-pixel { font-size: 14px; }
+/* === Global Base === */
+:root {
+  background: #0b0811;
+  color-scheme: dark;
+  --raidMagenta: #ec4899;
+  --raidLime: #b8ff36;
+  --raidGold: #ffcc00;
+  --raidText: #c7c7c7;
 }
 
-:root { background: #0b0811; }
+/* === Body === */
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--raidText);
+  background: #0b0811;
+  margin: 0;
+  overflow-x: hidden;
+}
 
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600&display=swap');
+/* === Pixel font shortcut === */
+.font-pixel {
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* === Layout tweaks === */
+.svh {
+  height: 100svh;
+}
 
 /* === Effects & Glow === */
 .pixel-shadow {
-  text-shadow: 0 2px 0 rgba(0,0,0,0.6), 0 0 8px rgba(184,255,54,0.35);
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.6),
+    0 0 8px rgba(184, 255, 54, 0.35);
 }
 
 .glow {
-  filter: drop-shadow(0 0 8px rgba(255,140,26,0.6));
+  filter: drop-shadow(0 0 8px rgba(255, 140, 26, 0.6));
 }
 
 .neon {
-  filter: drop-shadow(0 0 8px rgba(184,255,54,0.7));
+  filter: drop-shadow(0 0 8px rgba(184, 255, 54, 0.7));
 }
 
 .mag {
-  filter: drop-shadow(0 0 8px rgba(255,56,209,0.6));
+  filter: drop-shadow(0 0 8px rgba(255, 56, 209, 0.6));
 }
 
 /* === Lore Glow === */
 .lore-glow {
-  text-shadow: 0 0 12px rgba(180, 255, 180, 0.35);
+  text-shadow:
+    0 0 6px rgba(184, 255, 54, 0.4),
+    0 0 12px rgba(180, 255, 180, 0.35);
 }
 
-/* Subtle global flicker / heat */
-.overlay-flicker {
-  background:
-    radial-gradient(70% 35% at 50% 0%, rgba(255, 216, 107, 0.05), rgba(0,0,0,0) 70%),
-    radial-gradient(120% 80% at 50% 100%, rgba(255, 140, 26, 0.06), rgba(0,0,0,0) 60%);
-  mix-blend-mode: screen;
-  animation: overlayFlicker 2.6s ease-in-out infinite;
-  opacity: 0.6;
+/* === Pixel UI Elements === */
+.btn-pixel {
+  border: 4px solid var(--raidLime);
+  background: black;
+  color: var(--raidLime);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
-@keyframes overlayFlicker {
-  0%, 100% { filter: brightness(0.96); opacity: 0.55; }
-  50%      { filter: brightness(1.06); opacity: 0.7; }
+.btn-pixel:hover {
+  box-shadow: 0 0 8px var(--raidLime);
+  transform: translateY(-1px);
 }
-
-/* Embers: rise + drift + twinkle */
-.ember {
-  position: absolute;
-  bottom: -8vh;
-  border-radius: 9999px;
-  background: radial-gradient(circle at 30% 30%, #ffd86b 0%, #ff6a00 60%, rgba(255,106,0,0) 70%);
-  box-shadow:
-    0 0 10px rgba(255, 180, 60, 0.55),
-    0 0 18px rgba(255, 120, 0, 0.25);
-  mix-blend-mode: plus-lighter;
-  animation:
-    emberRise linear infinite,
-    emberDrift ease-in-out infinite,
-    emberTwinkle ease-in-out infinite;
-  opacity: 0.9;
-}
-@keyframes emberRise   { 0% { transform: translateY(0); } 100% { transform: translateY(-105vh); } }
-@keyframes emberDrift  { 0%,100% { margin-left: 0px; } 50% { margin-left: 14px; } }
-@keyframes emberTwinkle{ 0%,100% { filter: brightness(1); opacity: 0.8; } 50% { filter: brightness(1.35); opacity: 1; } }
-
-@media (prefers-reduced-motion: reduce) {
-  .overlay-flicker, .ember { animation: none !important; opacity: 0.5; }
-}
-
-/* === Layout & Components === */
-.bg-dungeon {
-  background-image: url('/img/torch_bg_4k.png');
-  background-size: cover;
-  background-position: center;
-}
-
-.card-border {
-  border: 3px solid rgba(255,255,255,0.08);
-  box-shadow: 0 0 0 2px rgba(255,56,209,0.3), inset 0 0 0 2px rgba(0,0,0,0.5);
+.btn-pixel:active {
+  transform: translateY(1px);
 }
 
 .input-pixel {
-  border: 3px solid rgba(255,255,255,0.2);
-  background: rgba(10,8,17,0.8);
-  color: #F3F0E8;
+  border: 3px solid var(--raidMagenta);
+  background: #000;
+  color: var(--raidText);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  padding: 0.6rem 0.8rem;
 }
 
-/* === Animated Button Glow === */
-@keyframes goldPulse {
-  0%, 100% { box-shadow: 0 0 10px rgba(217,164,65,0.3); }
-  50% { box-shadow: 0 0 20px rgba(217,164,65,0.9); }
+@media (max-width: 640px) {
+  .btn-pixel {
+    border-width: 3px;
+    font-size: 10px;
+  }
+  .input-pixel {
+    font-size: 10px;
+  }
 }
 
-.btn-pixel {
-  border: 4px solid #D9A441;
-  animation: goldPulse 3s ease-in-out infinite;
+/* === Scrollbars === */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0811;
+}
+::-webkit-scrollbar-thumb {
+  background: #2b2b2b;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
-.btn-pixel:hover {
-  box-shadow: 0 0 14px rgba(217,164,65,0.9);
+/* === Section fades === */
+section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
-/* Smooth section snapping + mobile-safe height */
-html { scroll-behavior: smooth; }
-
-/* Use small-viewport units on mobile so 100vh doesn't hide under the URL bar */
-.svh { min-height: 100svh; }
-
-/* === Background Particle Float === */
-@keyframes floatDrift {
-  0%, 100% { transform: translateY(0px) translateX(0px); }
-  50% { transform: translateY(-10px) translateX(5px); }
+/* === Utility overrides === */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
 }
 
-/* Apply to particle divs within .bg-dungeon sections */
-.bg-dungeon .absolute.w-1.h-1 {
-  animation: floatDrift 6s ease-in-out infinite;
+/* === Animations for coins/sparks (from ReadyRaidButton) === */
+@keyframes coinBurst {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(var(--s));
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--bx), var(--by)) rotate(var(--rot)) scale(var(--s));
+    opacity: 0;
+  }
+}
+.raid8-coin-burst {
+  position: fixed;
+  pointer-events: none;
+  width: 24px;
+  height: 24px;
+  animation: coinBurst linear forwards;
+  z-index: 90;
 }
 
-/* === Accessibility helpers === */
-:focus-visible { outline: 3px solid #B8FF36; outline-offset: 2px; }
-.visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; }
+@keyframes coinFall {
+  0% {
+    transform: translate(0, -10vh) rotate(0deg) scale(var(--s));
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--drift), 110vh) rotate(var(--rot)) scale(var(--s));
+    opacity: 0;
+  }
+}
+.raid8-coin-fall {
+  position: fixed;
+  pointer-events: none;
+  width: 20px;
+  height: 20px;
+  animation: coinFall linear forwards;
+  z-index: 90;
+}
 
-/* Reduced motion safety */
-@media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
-  html { scroll-behavior: auto; }
+/* Spark effect */
+@keyframes spark {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy));
+    opacity: 0;
+  }
+}
+.raid8-spark {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  background: var(--raidGold);
+  border-radius: 1px;
+  animation: spark ease-out forwards;
+  z-index: 95;
+}
+
+/* Screen flash & shake */
+.raid8-flash {
+  background: rgba(255, 255, 255, 0.25);
+  animation: flash 0.25s ease-out;
+}
+@keyframes flash {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.raid8-shake {
+  animation: shake 0.4s ease-in-out;
+}
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-4px, 2px); }
+  50% { transform: translate(4px, -2px); }
+  75% { transform: translate(-2px, 4px); }
 }

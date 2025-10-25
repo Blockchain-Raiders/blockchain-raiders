@@ -21,8 +21,8 @@ export default function Topbar() {
           />
         </a>
 
-        {/* CENTER: updated nav */}
-        <nav className="hidden sm:flex items-center gap-6 text-[15px] text-raidText/85">
+        {/* CENTER: Nav Menu (8-bit font) */}
+        <nav className="hidden sm:flex items-center gap-6 text-[11px] font-pixel uppercase tracking-wide text-raidText/85">
           <a href="#how" className="transition-colors duration-150 hover:text-raidLime">How to Play</a>
           <a href="#modes" className="transition-colors duration-150 hover:text-raidLime">Modes & Fairness</a>
           <a href="#relics" className="transition-colors duration-150 hover:text-raidLime">Relics</a>
@@ -42,7 +42,7 @@ export default function Topbar() {
           />
           <a
             href="/hub"
-            className="font-pixel text-[12px] px-3.5 py-2 rounded-lg border border-raidMagenta/40 text-raidGold transition-all duration-200 hover:border-raidMagenta/70"
+            className="font-pixel text-[11px] uppercase px-3.5 py-2 rounded-lg border border-raidMagenta/40 text-raidGold transition-all duration-200 hover:border-raidMagenta/70 hover:text-raidLime"
           >
             Enter Hub
           </a>
