@@ -208,3 +208,26 @@ a:hover {
   50% { transform: translate(4px, -2px); }
   75% { transform: translate(-2px, 4px); }
 }
+/* === Responsive Safety Fixes (do NOT affect visuals) === */
+* {
+  min-width: 0; /* allow flex/grid children to shrink naturally */
+}
+
+html, body {
+  overflow-x: hidden; /* prevent sideways scroll at tiny widths */
+}
+
+section > div {
+  max-width: 100%; /* clamp section inner wrappers to viewport width */
+}
+
+img {
+  max-width: 100%; /* ensure images shrink within parent width */
+  height: auto;
+  display: block;
+}
+
+.break-all {
+  word-break: break-word; /* for long hashes / non-breaking text */
+}
+
