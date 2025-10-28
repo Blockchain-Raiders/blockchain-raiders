@@ -21,7 +21,7 @@ export default function Topbar() {
           />
         </a>
 
-        {/* RIGHT: Coin + COMING SOON */}
+        {/* RIGHT: Coin + ROAD MAP */}
         <div className="flex items-center gap-3 shrink-0">
           <Image
             src="/img/token_coin.png"
@@ -33,9 +33,7 @@ export default function Topbar() {
             style={{ imageRendering: "pixelated" }}
           />
           <a
-            href="https://blockchainraiders.com"
-            target="_blank"
-            rel="noreferrer"
+            href="/roadmap"
             className="
               font-pixel
               text-[11px]
@@ -49,7 +47,7 @@ export default function Topbar() {
               transition-all duration-200
             "
           >
-            COMING SOON
+            ROAD MAP
           </a>
         </div>
       </div>
