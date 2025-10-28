@@ -11,7 +11,6 @@ export default function ComingSoon() {
   const [heroLogoSrc, setHeroLogoSrc] = useState("/img/logo_full.png");
   const [showTelegram, setShowTelegram] = useState(false);
 
-  // Reveal Telegram link after button press
   const handleRaidPress = () => {
     setTimeout(() => setShowTelegram(true), 2000);
   };
@@ -24,14 +23,19 @@ export default function ComingSoon() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      {/* === Background === */}
-      <img
-        src="/img/torch_bg_4k.png"
-        alt="Pixel dungeon wall"
-        className="fixed inset-0 -z-10 h-full w-full object-cover object-top"
-        style={{ imageRendering: "pixelated" }}
-      />
+      {/* === Background (fully restored) === */}
+      <div className="fixed inset-0 -z-10">
+        <img
+          src="/img/torch_bg_4k.png"
+          alt="Pixel dungeon wall"
+          className="h-full w-full object-cover object-top"
+          style={{ imageRendering: "pixelated" }}
+        />
+        {/* Dark overlay for contrast */}
+        <div className="absolute inset-0 bg-black/40" />
+      </div>
 
+      {/* === Top bar === */}
       <Topbar />
 
       {/* === Main Content === */}
@@ -54,7 +58,7 @@ export default function ComingSoon() {
             COMING SOON!
           </h1>
 
-          {/* PRESS TO RAID button (unchanged behavior) */}
+          {/* PRESS TO RAID button */}
           <div
             className="cursor-pointer select-none"
             onClick={handleRaidPress}
@@ -64,13 +68,12 @@ export default function ComingSoon() {
             <ReadyRaidButton />
           </div>
 
-          {/* existing Raiders Ready counter styled in pink */}
+          {/* Raiders Ready Counter */}
           <div className="mt-4 font-pixel text-raidMagenta text-sm sm:text-base drop-shadow-[0_0_10px_rgba(236,72,153,0.6)]">
-            {/* this line assumes your ReadyRaidButton or a global variable already renders "Raiders Ready:" with a number */}
             <span id="raiders-ready-counter"></span>
           </div>
 
-          {/* reveal Telegram link after press */}
+          {/* Telegram link reveal */}
           {showTelegram && (
             <div className="mt-6 text-center animate-fade-in">
               <a
@@ -86,21 +89,28 @@ export default function ComingSoon() {
         </div>
       </main>
 
-      {/* fade-in animation */}
+      {/* === Styles === */}
       <style jsx global>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(6px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-in {
-          animation: fadeIn 0.6s ease-out forwards;
-        }
+        .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
 
-        /* ensure any text inside #raiders-ready-counter inherits pink glow + font */
         #raiders-ready-counter {
           font-family: var(--font-pixel, 'Press Start 2P', monospace);
           color: #ec4899;
-          text-shadow: 0 0 8px rgba(236, 72, 153, 0.6);
+          text-shadow: 0 0 8px rgba(236,72,153,0.6);
+        }
+
+        /* Fallback wallpaper (ensures visible even if <img> fails) */
+        body {
+          background-image: url('/img/torch_bg_4k.png');
+          background-size: cover;
+          background-position: top center;
+          background-repeat: no-repeat;
+          background-attachment: fixed;
+          background-color: #0b0811;
         }
       `}</style>
     </div>
