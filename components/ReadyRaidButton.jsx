@@ -167,7 +167,7 @@ export default function ReadyRaidButton() {
     } catch (e) { setError(e.message); } finally { setBusy(false); }
   }, [busy, clicked, credits, total, coinBurst, startTopRain, sparkles, flashAndShake, playSound]);
 
-  const sub = total == null ? 'Loading…' : `Raiders ready: ${total}`;
+  const sub = total == null ? 'Loading…' : `Raiders Ready: ${total}`;
 
   return (
     <div className={`relative flex flex-col items-center gap-4 ${shake ? 'raid8-shake' : ''}`}>
@@ -178,7 +178,6 @@ export default function ReadyRaidButton() {
         CREDITS: {credits}
       </div>
 
-      {/* Only render button if NOT clicked */}
       {!clicked && (
         <button
           ref={btnRef}
@@ -196,14 +195,17 @@ export default function ReadyRaidButton() {
         <div className="font-pixel text-raidGold text-xs md:text-sm mt-1 raid8-insert-coin">INSERT COIN</div>
       ) : (
         <>
-          <div
+          {/* SAME CLASSES, now just clickable */}
+          <a
+            href={TELEGRAM_URL}
+            target="_blank"
+            rel="noreferrer"
             className="font-pixel text-raidLime text-xl md:text-3xl mt-3 text-center drop-shadow-[0_0_8px_rgba(4,245,165,0.7)]"
             style={{ imageRendering:'pixelated' }}
           >
             JOIN THE TELEGRAM FOR UPDATES
-          </div>
+          </a>
 
-          {/* TELEPORT FLASH + LOGO */}
           <div className="relative mt-2">
             <span className="raid8-teleport" aria-hidden="true" />
             <a
@@ -230,9 +232,16 @@ export default function ReadyRaidButton() {
         </>
       )}
 
-      <div className="text-xs md:text-sm font-ui text-raidText/80">{sub}</div>
+      <div
+        className="font-pixel text-raidMagenta text-xl md:text-3xl mt-3 text-center drop-shadow-[0_0_10px_rgba(236,72,153,0.6)]"
+        style={{ imageRendering: 'pixelated' }}
+      >
+        {sub}
+      </div>
+
       {error && <div className="text-[11px] text-raidMagenta/90 mt-1">{error}</div>}
 
+      {/* original effect styles intact */}
       <style jsx global>{`
         .raid8-bg{background:repeating-linear-gradient(45deg,rgba(0,0,0,0)0 6px,rgba(255,255,255,0.04)6px 12px),linear-gradient(180deg,rgba(25,45,25,1)0%,rgba(12,24,12,1)100%);}
         .raid8-border{box-shadow:0 0 0 2px #0b1b0b,0 0 0 4px #1d3a1d,inset 0 0 0 2px #56ff9a,inset 0 0 0 4px #2bbf6c;}
@@ -256,11 +265,9 @@ export default function ReadyRaidButton() {
         @keyframes raid8-blink{0%,60%{opacity:1;}61%,100%{opacity:0;}}
         .raid8-insert-coin{animation:raid8-blink 1s steps(2,end)infinite;letter-spacing:.08em;text-shadow:0 0 8px rgba(255,215,0,.35);}
 
-        /* Telegram pulse (no spin) */
         @keyframes raid8-telegram-pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
         .raid8-telegram-pulse{animation:raid8-telegram-pulse 1.2s ease-in-out infinite;}
 
-        /* TELEPORT FLASH (pixelated, one-shot) */
         .raid8-teleport{
           position:absolute; inset:-40px; z-index:1; pointer-events:none; image-rendering:pixelated;
           animation: raid8-teleport-pop .75s steps(6,end) 1 forwards;
