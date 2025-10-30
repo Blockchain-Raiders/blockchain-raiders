@@ -179,7 +179,7 @@ export default function RoadmapPage() {
           >
             <ul className="list-disc list-inside text-sm text-raidText/85 space-y-1.5">
               <li>Queueing/lobbies, fair matchmaking, and session persistence.</li>
-              <li>Provable fairness hooks across active modes (+ <Mono>/verify</Mono> tooling).</li>
+              <li>Provable fairness hooks across active modes (+ <Mono>Verify</Mono> tooling).</li>
               <li>Mode roster expands from Demo; select teasers withheld.</li>
               <li>Light economy & rewards; competitive tuning continues.</li>
               <li><Redacted /> new PvP twist revealed mid-Beta.</li>
