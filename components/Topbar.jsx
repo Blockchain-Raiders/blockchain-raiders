@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from "next/image";
 
 export default function Topbar() {
   return (
@@ -8,7 +8,7 @@ export default function Topbar() {
         <div className="absolute left-0 top-0 h-full w-[50vw] bg-gradient-to-r from-black/60 via-black/25 to-transparent" />
       </div>
 
-      <div className="relative z-10 mx-auto flex h-[72px] max-w-6xl items-center justify-between px-4 overflow-visible">
+      <div className="relative z-10 mx-auto flex h-[60px] sm:h-[72px] max-w-6xl items-center justify-between px-2 sm:px-4 overflow-visible">
         {/* LEFT: Logo */}
         <a
           href="/"
@@ -20,38 +20,41 @@ export default function Topbar() {
             width={540}
             height={180}
             priority
-            className="h-[100px] md:h-[108px] lg:h-[112px] w-auto object-contain -mt-2"
+            className="h-[60px] sm:h-[90px] md:h-[108px] lg:h-[112px] w-auto object-contain"
           />
         </a>
 
-        {/* CENTER: nav (anchors removed) */}
+        {/* CENTER: placeholder nav */}
         <nav className="hidden sm:flex items-center gap-6 text-[11px] font-pixel uppercase tracking-wide text-raidText/85">
-          {/* keep a stable child so SSR/CSR trees always match */}
           <span className="sr-only">nav</span>
         </nav>
 
-        {/* RIGHT: Coin + CTAs */}
-        <div className="flex items-center gap-3 shrink-0">
-          <Image
-            src="/img/token_coin.png"
-            alt="RAID Coin"
-            width={32}
-            height={32}
-            priority
-            className="h-[32px] w-[32px]"
-            style={{ imageRendering: 'pixelated' }}
-          />
+        {/* RIGHT: Coin (hidden on smallest) + CTAs */}
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          {/* Hide coin on very small screens */}
+          <div className="hidden xs:block sm:block">
+            <Image
+              src="/img/token_coin.png"
+              alt="RAID Coin"
+              width={24}
+              height={24}
+              priority
+              className="h-[24px] w-[24px] sm:h-[32px] sm:w-[32px]"
+              style={{ imageRendering: "pixelated" }}
+            />
+          </div>
 
-          {/* Unified pink base / lime hover text */}
+          {/* Buttons — tiny on mobile, pink base with green hover text */}
           {[
-            { label: 'ROAD MAP', href: '/roadmap' },
-            { label: 'HOW IT WORKS', href: '/how-it-works/' },
-            { label: 'VERIFY A ROUND', href: '/verify' },
+            { label: "ROAD MAP", href: "/roadmap" },
+            { label: "HOW IT WORKS", href: "/how-it-works/" },
+            { label: "VERIFY A ROUND", href: "/verify" },
           ].map((b) => (
             <a
               key={b.href}
               href={b.href}
-              className="font-pixel text-[11px] uppercase px-3.5 py-2 rounded-lg border border-raidMagenta/50 text-raidMagenta transition-colors duration-200 hover:text-raidLime"
+              className="font-pixel uppercase border border-raidMagenta/50 text-raidMagenta transition-colors duration-200 hover:text-raidLime
+                text-[8px] px-1.5 py-[3px] sm:text-[10px] sm:px-2.5 sm:py-[5px] md:text-[11px] md:px-3.5 md:py-2 rounded-md"
             >
               {b.label}
             </a>
