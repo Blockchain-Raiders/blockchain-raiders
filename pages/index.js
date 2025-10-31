@@ -115,20 +115,18 @@ const [countTarget, setCountTarget] = useState(null);
 useEffect(() => {
   setMounted(true);
 
+  // 1. Create date 14 days from now
   const now = new Date();
+  const target = new Date(now);
+  target.setDate(target.getDate() + 14);
 
-  // today 23:00 local
-  const today2300 = new Date();
-  today2300.setHours(23, 0, 0, 0);
+  // 2. Set to 23:00 UK time (GMT, no DST offset)
+  // new Date() always uses local timezone, so we convert manually
+  const utcHour = 23 - target.getTimezoneOffset() / 60; // adjust to actual UTC hour
+  target.setUTCHours(utcHour, 0, 0, 0);
 
-  // tomorrow 23:00 local
-  const tomorrow2300 = new Date(today2300);
-  tomorrow2300.setDate(tomorrow2300.getDate() + 1);
-
-  // pick the right target
-  const targetDate = now < today2300 ? today2300 : tomorrow2300;
-
-  setCountTarget(targetDate.toISOString());
+  // 3. Save numeric timestamp (not ISO) to avoid timezone shift
+  setCountTarget(target.getTime());
 }, []);
 
   // ---------- HYDRATION-SAFE: fairness demo values generated after mount ----------
@@ -208,46 +206,78 @@ useEffect(() => {
           aria-label="Hero"
         >
  
-          <main className="relative z-10 w-full max-w-6xl mx-auto px-6 pt-24 pb-12 flex flex-col items-center gap-6">
-            <HeaderLogo />
-            <p className="font-ui text-raidText/90 text-lg md:text-xl text-center max-w-2xl">
-              In the ruins of Web3, a new order rises…{' '}
-              <span className="text-raidLime font-semibold">
-                The Raiders
-              </span>
-              .
-            </p>
-            <div className="flex flex-col items-center gap-4">
-  {mounted && countTarget && (
-    <div className="text-center">
-      <span className="block font-pixel text-raidLime text-lg mb-1">CA DROP:</span>
+        <main className="relative z-10 w-full max-w-6xl mx-auto px-6 pt-24 pb-12 flex flex-col items-center text-center gap-8">
+
+  {/* Logo + Lore */}
+  <div className="flex flex-col items-center gap-4 max-w-2xl">
+    <HeaderLogo />
+    <p className="font-ui text-raidText/90 text-lg md:text-xl max-w-2xl">
+      In the ruins of Web3, a new order rises…{" "}
+      <span className="text-raidLime font-semibold">The Raiders</span>.
+    </p>
+  </div>
+
+{/* Countdown / Address / CTA panel */}
+{mounted && countTarget && (
+  <div
+    className="
+      flex flex-col items-center gap-6
+      px-6 py-8
+      rounded-xl
+      bg-black/40
+      border border-raidPink/40
+      shadow-[0_0_32px_rgba(255,0,128,0.3)]
+      w-full max-w-lg md:max-w-2xl
+    "
+  >
+    {/* Address */}
+    <div className="flex flex-col items-center gap-2">
+      <span className="block font-pixel text-raidLime text-lg md:text-xl tracking-tight">
+        COIN ADDRESS:
+      </span>
+      <span className="block font-pixel text-raidPink text-base md:text-lg break-all leading-tight max-w-[480px]">
+        HuVqLxPcuCqZHMAdNBec2CcFaJ5g6M5TCpzzCQ5Ppump
+      </span>
+    </div>
+
+    {/* Countdown */}
+    <div className="flex flex-col items-center gap-2">
+      <span className="block font-pixel text-raidLime text-lg md:text-xl tracking-tight">
+        RELIC COLLECTION DROP (NFTs)
+      </span>
       <Countdown target={countTarget} />
     </div>
-  )}
-  <ReadyRaidButton />
-</div>
-            <div
-              className="mt-4 flex items-center gap-3"
-              aria-hidden="true"
-            >
-              <Image
-                src="/img/token_coin.png"
-                width={32}
-                height={32}
-                className="glow"
-                alt=""
-              />
-              <span className="font-pixel text-raidGold text-base md:text-lg">
-                Play. Plunder. Vitality.
-              </span>
-            </div>
-            <a
-              href="#how"
-              className="mt-6 font-pixel text-raidLime text-xs opacity-70 hover:opacity-100"
-            >
-              ▼ Scroll
-            </a>
-          </main>
+
+    {/* CTA */}
+    <ReadyRaidButton />
+  </div>
+)}
+
+
+  {/* Tagline + Scroll hint */}
+  <div className="flex flex-col items-center gap-4" aria-hidden="true">
+    <div className="flex items-center justify-center gap-3">
+      <Image
+        src="/img/token_coin.png"
+        width={32}
+        height={32}
+        className="glow"
+        alt=""
+      />
+      <span className="font-pixel text-raidGold text-base md:text-lg">
+        Play. Plunder. Vitality.
+      </span>
+    </div>
+
+    <a
+      href="#how"
+      className="font-pixel text-raidLime text-xs opacity-70 hover:opacity-100 block"
+    >
+      ▼ Scroll
+    </a>
+  </div>
+
+</main>
         </section>
 
         {/* HOW IT WORKS */}
@@ -385,7 +415,7 @@ useEffect(() => {
         },
         {
           title: 'Raid Duels',
-          subtitle: 'PvP fair coinflip',
+          subtitle: 'Provably-fair PvP',
           img: '/img/modes/duel.png',
         },
         {
@@ -643,100 +673,164 @@ useEffect(() => {
           </div>
         </section>
 
-        {/* COMMUNITY */}
-        <section
-          id="community"
-          className="pt-16 pb-24 lg:pt-0 lg:pb-0 lg:svh lg:min-h-screen lg:snap-start lg:flex lg:items-center"
-          aria-label="Community"
+     {/* COMMUNITY */}
+<section
+  id="community"
+  className="pt-16 pb-24 lg:pt-0 lg:pb-0 lg:svh lg:min-h-screen lg:snap-start lg:flex lg:items-center"
+  aria-label="Community"
+>
+  <div className="w-full max-w-4xl mx-auto px-6 text-center">
+    <h2 className="font-pixel text-raidLime text-2xl mb-2 lore-glow">
+      BECOME A RAIDER
+    </h2>
+    <p className="font-ui text-raidText/80 mb-8">
+      JOIN THE TELEGRAM!
+    </p>
+
+    {/* SOCIAL LINKS WRAPPER */}
+    <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:items-stretch">
+
+
+      {/* TELEGRAM CARD */}
+      <a
+        href="https://t.me/+2XQ3CRHbRGc4YmY0"
+        target="_blank"
+        rel="noreferrer"
+        className="select-none"
+        aria-label="Join the Blockchain Raiders Telegram"
+      >
+        <div
+          className="relative mx-auto"
+          style={{ width: 256, imageRendering: 'pixelated' }}
         >
-          <div className="w-full max-w-4xl mx-auto px-6 text-center">
-            <h2 className="font-pixel text-raidLime text-2xl mb-2 lore-glow">
-              BECOME A RAIDER
-            </h2>
-            <p className="font-ui text-raidText/80 mb-8">
-              JOIN THE TELEGRAM!
-            </p>
-
-            <a
-              href="https://t.me/+2XQ3CRHbRGc4YmY0"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-block select-none"
-              aria-label="Join the Blockchain Raiders Telegram"
-            >
+          <div
+            className="relative"
+            style={{
+              width: 256,
+              height: 256,
+              background: '#27A7E7',
+              boxShadow:
+                '0 0 0 4px #0B6FAE, 0 0 0 8px #073B5C, 0 0 0 12px rgba(7,59,92,0.6), 0 0 48px rgba(39,167,231,0.45)',
+              borderRadius: 8,
+            }}
+          >
+            {['left-0 top-0','right-0 top-0','left-0 bottom-0','right-0 bottom-0'].map((pos) => (
               <div
-                className="relative mx-auto"
-                style={{ width: 256, imageRendering: 'pixelated' }}
-              >
-                <div
-                  className="relative"
-                  style={{
-                    width: 256,
-                    height: 256,
-                    background: '#27A7E7',
-                    boxShadow:
-                      '0 0 0 4px #0B6FAE, 0 0 0 8px #073B5C, 0 0 0 12px rgba(7,59,92,0.6), 0 0 48px rgba(39,167,231,0.45)',
-                    borderRadius: 8,
-                  }}
-                >
-                  {[
-                    'left-0 top-0',
-                    'right-0 top-0',
-                    'left-0 bottom-0',
-                    'right-0 bottom-0',
-                  ].map((pos) => (
-                    <div
-                      key={pos}
-                      className={`absolute ${pos} w-3 h-3`}
-                      style={{ background: '#0B6FAE' }}
-                    />
-                  ))}
+                key={pos}
+                className={`absolute ${pos} w-3 h-3`}
+                style={{ background: '#0B6FAE' }}
+              />
+            ))}
 
-                  <svg
-                    viewBox="0 0 512 512"
-                    className="absolute inset-0 m-auto"
-                    style={{
-                      width: 192,
-                      height: 192,
-                      filter:
-                        'drop-shadow(0 0 12px rgba(255,255,255,0.6))',
-                    }}
-                  >
-                    <path
-                      d="M476.5 35.5L22.8 214.2c-22.9 9.1-22.6 41.8.5 50.2l116.7 42.6 44.8 142.2c7.2 23 36.5 29.8 53.3 12.3l65.4-66.9 112.2 85.4c20.2 15.4 49.5 4.1 54.5-21l64.5-392.4c4.8-26.8-19.6-48.6-46.7-40.7z"
-                      fill="#ffffff"
-                    />
-                    <path
-                      d="M206 338l16.2 99.5c2.5 15.6 23.4 21.5 33.8 9.7l58.8-67.7 99.9 75.6c13.4 10.2 33 2.8 36.3-13.5l52.8-321.9c3.1-16.8-13-30.4-28.7-24.8L89.2 255.6c-15.9 5.6-15.7 28.9.4 34.3l91 29.7c9.3 3 19.5 1.2 27.2-4.7l246.6-188.5c7.6-5.8 16.1 4.8 9.2 11.3L232.4 329.4c-7.8 7.2-18.8 9.8-29.1 8.6l2.7-.1z"
-                      fill="#e6f6ff"
-                    />
-                  </svg>
+            <svg
+              viewBox="0 0 512 512"
+              className="absolute inset-0 m-auto"
+              style={{
+                width: 192,
+                height: 192,
+                filter: 'drop-shadow(0 0 12px rgba(255,255,255,0.6))',
+              }}
+            >
+              <path
+                d="M476.5 35.5L22.8 214.2c-22.9 9.1-22.6 41.8.5 50.2l116.7 42.6 44.8 142.2c7.2 23 36.5 29.8 53.3 12.3l65.4-66.9 112.2 85.4c20.2 15.4 49.5 4.1 54.5-21l64.5-392.4c4.8-26.8-19.6-48.6-46.7-40.7z"
+                fill="#ffffff"
+              />
+              <path
+                d="M206 338l16.2 99.5c2.5 15.6 23.4 21.5 33.8 9.7l58.8-67.7 99.9 75.6c13.4 10.2 33 2.8 36.3-13.5l52.8-321.9c3.1-16.8-13-30.4-28.7-24.8L89.2 255.6c-15.9 5.6-15.7 28.9.4 34.3l91 29.7c9.3 3 19.5 1.2 27.2-4.7l246.6-188.5c7.6-5.8 16.1 4.8 9.2 11.3L232.4 329.4c-7.8 7.2-18.8 9.8-29.1 8.6l2.7-.1z"
+                fill="#e6f6ff"
+              />
+            </svg>
 
-                  <div
-                    className="pointer-events-none absolute inset-0"
-                    style={{
-                      background:
-                        'radial-gradient(60% 60% at 50% 50%, rgba(39,167,231,0.35), transparent 70%)',
-                      filter: 'blur(10px)',
-                    }}
-                  />
-                </div>
-
-                <div className="mt-4 font-pixel text-white text-lg text-center">
-                  BECOME A RAIDER —{' '}
-                  <span className="text-raidLime">
-                    JOIN THE TELEGRAM
-                  </span>
-                </div>
-              </div>
-            </a>
-
-            <div className="mt-10 text-raidText/50 text-xs">
-              © {new Date().getFullYear()} Blockchain Raiders — Built
-              on Solana
-            </div>
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  'radial-gradient(60% 60% at 50% 50%, rgba(39,167,231,0.35), transparent 70%)',
+                filter: 'blur(10px)',
+              }}
+            />
           </div>
-        </section>
+
+          <div className="mt-4 font-pixel text-white text-lg text-center">
+            BECOME A RAIDER —{' '}
+            <span className="text-raidLime">
+              JOIN THE TELEGRAM
+            </span>
+          </div>
+        </div>
+      </a>
+
+      {/* X / TWITTER CARD */}
+      <a
+        href="https://x.com/OfficialBSGS"
+        target="_blank"
+        rel="noreferrer"
+        className="select-none"
+        aria-label="Follow Blockchain Raiders on X / Twitter"
+      >
+        <div
+          className="relative mx-auto"
+          style={{ width: 256, imageRendering: 'pixelated' }}
+        >
+          <div
+            className="relative"
+            style={{
+              width: 256,
+              height: 256,
+              background: '#000000',
+              boxShadow:
+                '0 0 0 4px #444, 0 0 0 8px #222, 0 0 0 12px rgba(0,0,0,0.8), 0 0 48px rgba(255,255,255,0.25)',
+              borderRadius: 8,
+            }}
+          >
+            {['left-0 top-0','right-0 top-0','left-0 bottom-0','right-0 bottom-0'].map((pos) => (
+              <div
+                key={pos}
+                className={`absolute ${pos} w-3 h-3`}
+                style={{ background: '#444' }}
+              />
+            ))}
+
+            {/* X logo */}
+            <svg
+              viewBox="0 0 24 24"
+              className="absolute inset-0 m-auto"
+              style={{
+                width: 192,
+                height: 192,
+                filter: 'drop-shadow(0 0 12px rgba(255,255,255,0.6))',
+                fill: '#fff',
+              }}
+            >
+              <path d="M18.244 2h3.308l-7.227 8.26L22 22h-6.593l-4.31-6.236L6.05 22H2.74l7.73-8.835L2 2h6.683l3.87 5.545L18.244 2zm-1.157 17.52h1.833L7.104 4.39H5.14l11.947 15.13z" />
+            </svg>
+
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  'radial-gradient(60% 60% at 50% 50%, rgba(255,255,255,0.18), transparent 70%)',
+                filter: 'blur(10px)',
+              }}
+            />
+          </div>
+
+          <div className="mt-4 font-pixel text-white text-lg text-center">
+            BECOME A RAIDER —{' '}
+            <span className="text-raidLime">
+              FOLLOW US ON X
+            </span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div className="mt-10 text-raidText/50 text-xs">
+      © {new Date().getFullYear()} Blockchain Raiders — Built on Solana
+    </div>
+  </div>
+</section>
+
       </div>
     </div>
   );
