@@ -109,17 +109,26 @@ export default function Home() {
   const ogImage = `${siteUrl}/og.jpg`;
 
   // ---------- HYDRATION-SAFE: client-only countdown target ----------
-  const [mounted, setMounted] = useState(false);
-  const [countTarget, setCountTarget] = useState(null);
- useEffect(() => {
+const [mounted, setMounted] = useState(false);
+const [countTarget, setCountTarget] = useState(null);
+
+useEffect(() => {
   setMounted(true);
-  // Calculate tomorrow 11:00 PM UK time
+
   const now = new Date();
-  const tomorrow = new Date(now);
-  tomorrow.setDate(now.getDate() + 1);
-  // Set to 11:00 PM UK (23:00)
-  tomorrow.setUTCHours(23 - (now.getTimezoneOffset() / 60), 0, 0, 0);
-  setCountTarget(tomorrow.toISOString());
+
+  // today 23:00 local
+  const today2300 = new Date();
+  today2300.setHours(23, 0, 0, 0);
+
+  // tomorrow 23:00 local
+  const tomorrow2300 = new Date(today2300);
+  tomorrow2300.setDate(tomorrow2300.getDate() + 1);
+
+  // pick the right target
+  const targetDate = now < today2300 ? today2300 : tomorrow2300;
+
+  setCountTarget(targetDate.toISOString());
 }, []);
 
   // ---------- HYDRATION-SAFE: fairness demo values generated after mount ----------
