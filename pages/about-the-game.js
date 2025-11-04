@@ -169,25 +169,25 @@ export default function AboutTheGame() {
 
       <Topbar />
 
-      <main className="relative z-10 w-full max-w-5xl mx-auto px-6 py-24 space-y-16">
+      <main className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 py-20 sm:py-24 space-y-12 sm:space-y-16">
         <header className="text-center space-y-6">
-          <div className="inline-flex items-center gap-3 rounded-full border border-raidMagenta/60 bg-black/70 px-5 py-2 font-pixel text-raidLime text-xs tracking-[0.3em] uppercase">
+          <div className="inline-flex items-center gap-3 rounded-full border border-raidMagenta/60 bg-black/70 px-4 sm:px-5 py-2 font-pixel text-raidLime text-[0.65rem] sm:text-xs tracking-[0.3em] uppercase">
             ⚔️ Blockchain Raiders: Battle for Vitality
           </div>
-          <h1 className="font-pixel text-5xl md:text-6xl text-white lore-glow">Play. Plunder. Vitality.</h1>
-          <p className="font-ui text-base md:text-lg text-raidText/80 max-w-3xl mx-auto">
+          <h1 className="font-pixel text-3xl sm:text-4xl md:text-6xl text-white lore-glow">Play. Plunder. Vitality.</h1>
+          <p className="font-ui text-sm sm:text-base md:text-lg text-raidText/80 max-w-3xl mx-auto">
             A browser-based PvP RPG built on Solana where customizable warriors clash in real-time battles, hunt Relics of the old world, and fight for fragments of Vitality.
           </p>
-          <div className="flex flex-wrap justify-center gap-3 text-xs font-pixel uppercase text-raidText/70">
-            <span className="rounded-full border border-raidText/30 bg-black/60 px-4 py-2">Network: Solana</span>
-            <span className="rounded-full border border-raidText/30 bg-black/60 px-4 py-2">Token: $RAID</span>
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 text-[0.65rem] sm:text-xs font-pixel uppercase text-raidText/70">
+            <span className="rounded-full border border-raidText/30 bg-black/60 px-3 sm:px-4 py-1.5 sm:py-2">Network: Solana</span>
+            <span className="rounded-full border border-raidText/30 bg-black/60 px-3 sm:px-4 py-1.5 sm:py-2">Token: $RAID</span>
           </div>
         </header>
 
         <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl shadow-xl shadow-raidMagenta/10 backdrop-blur-lg overflow-hidden">
           <div className="grid md:grid-cols-[3fr_2fr] gap-0">
-            <div className="p-10 space-y-6">
-              <h2 className="font-pixel text-raidLime text-3xl">1. Introduction</h2>
+            <div className="p-6 sm:p-8 lg:p-10 space-y-6">
+              <h2 className="font-pixel text-raidLime text-3xl">1. Intro</h2>
               <p className="font-ui text-raidText/85">
                 In the aftermath of a fallen digital world, the last survivors — the Raiders — battle for fragments of Vitality, the energy that sustains existence on the chain.
               </p>
@@ -198,7 +198,7 @@ export default function AboutTheGame() {
                 The experience is fully web-based — no downloads, no wallet popups. Create an in-game account, fund it with $RAID, and step straight into combat.
               </p>
             </div>
-            <div className="bg-gradient-to-br from-raidMagenta/10 via-raidMagenta/5 to-transparent p-10 border-t md:border-l border-raidMagenta/20">
+            <div className="bg-gradient-to-br from-raidMagenta/10 via-raidMagenta/5 to-transparent p-6 sm:p-8 lg:p-10 border-t md:border-l border-raidMagenta/20">
               <h3 className="font-pixel text-raidLime text-xl mb-4">Core Facts</h3>
               <ul className="space-y-3 font-ui text-sm text-raidText/75">
                 <li><span className="font-semibold text-white">Platform:</span> Browser-based PvP RPG on Solana.</li>
@@ -209,7 +209,7 @@ export default function AboutTheGame() {
           </div>
         </section>
 
-        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-10 space-y-10 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
+        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-8 sm:space-y-10 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
           <header className="space-y-3">
             <h2 className="font-pixel text-raidLime text-3xl">2. Core Vision</h2>
             <p className="font-ui text-raidText/85">
@@ -229,7 +229,7 @@ export default function AboutTheGame() {
           </div>
         </section>
 
-        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
+        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
           <h2 className="font-pixel text-raidLime text-3xl">3. Player Accounts &amp; Economy</h2>
           <div className="space-y-8">
             <div className="space-y-3">
@@ -258,7 +258,7 @@ export default function AboutTheGame() {
           </div>
         </section>
 
-        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-10 space-y-6 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
+        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-6 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
           <h2 className="font-pixel text-raidLime text-3xl">4. Gameplay Overview</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-3">
@@ -281,7 +281,7 @@ export default function AboutTheGame() {
           </div>
         </section>
 
-        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
+        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
           <header className="space-y-3">
             <h2 className="font-pixel text-raidLime text-3xl">5. The Duel System</h2>
             <p className="font-ui text-raidText/80">
@@ -310,7 +310,7 @@ export default function AboutTheGame() {
           </div>
         </section>
 
-        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
+        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
           <h2 className="font-pixel text-raidLime text-3xl">6. Relics &amp; Crafting</h2>
           <div className="space-y-3">
             <h3 className="font-pixel text-white text-lg">6.1 What Are Relics?</h3>
@@ -319,22 +319,24 @@ export default function AboutTheGame() {
             </p>
           </div>
           <div className="overflow-hidden rounded-xl border border-raidText/20">
-            <table className="min-w-full divide-y divide-raidText/20 text-sm">
-              <thead className="bg-black/70 text-raidText/70 uppercase tracking-widest font-pixel text-xs">
-                <tr>
-                  <th className="px-4 py-3 text-left">Type</th>
-                  <th className="px-4 py-3 text-left">Function</th>
-                </tr>
-              </thead>
-              <tbody className="bg-black/40">
-                {relicTypes.map(({ type, detail }) => (
-                  <tr key={type} className="divide-x divide-raidText/10">
-                    <td className="px-4 py-4 font-pixel text-white">{type}</td>
-                    <td className="px-4 py-4 font-ui text-raidText/75">{detail}</td>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-raidText/20 text-sm">
+                <thead className="bg-black/70 text-raidText/70 uppercase tracking-widest font-pixel text-xs">
+                  <tr>
+                    <th className="px-4 py-3 text-left">Type</th>
+                    <th className="px-4 py-3 text-left">Function</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="bg-black/40">
+                  {relicTypes.map(({ type, detail }) => (
+                    <tr key={type} className="divide-x divide-raidText/10">
+                      <td className="px-4 py-4 font-pixel text-white">{type}</td>
+                      <td className="px-4 py-4 font-ui text-raidText/75">{detail}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-black/40 border border-raidText/20 rounded-xl p-6 space-y-3">
@@ -360,7 +362,7 @@ export default function AboutTheGame() {
           </div>
         </section>
 
-        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
+        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
           <h2 className="font-pixel text-raidLime text-3xl">7. Vitality System</h2>
           <p className="font-ui text-raidText/80">
             Vitality is the energy that powers Blockchain Raiders. It fuels crafting, unlocks arenas, and determines your standing on leaderboards and within Armies.
@@ -380,7 +382,7 @@ export default function AboutTheGame() {
           </div>
         </section>
 
-        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
+        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
           <h2 className="font-pixel text-raidLime text-3xl">8. Armies (Guilds)</h2>
           <p className="font-ui text-raidText/80">
             Armies are Raider collectives that coordinate strategy, share resources, and wage large-scale wars for territory control.
@@ -393,7 +395,7 @@ export default function AboutTheGame() {
           </ul>
         </section>
 
-        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-10 space-y-6 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
+        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-6 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
           <h2 className="font-pixel text-raidLime text-3xl">9. Leaderboards &amp; Seasons</h2>
           <p className="font-ui text-raidText/80">
             Every season refreshes the battlefield with new Relics, map shifts, and balance updates before crowning the top Raiders and Armies.
@@ -405,7 +407,7 @@ export default function AboutTheGame() {
           </ul>
         </section>
 
-        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
+        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
           <header className="space-y-3">
             <h2 className="font-pixel text-raidLime text-3xl">10. The Demo (MVP)</h2>
             <p className="font-ui text-raidText/80">
@@ -432,7 +434,7 @@ export default function AboutTheGame() {
           </div>
         </section>
 
-        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
+        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
           <h2 className="font-pixel text-raidLime text-3xl">11. Development Pipeline</h2>
           <div className="grid gap-4">
             {developmentPipeline.map(({ feature, description, status }) => (
@@ -449,7 +451,7 @@ export default function AboutTheGame() {
           </div>
         </section>
 
-        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
+        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-8 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
           <header className="space-y-3">
             <h2 className="font-pixel text-raidLime text-3xl">12. Token Utility ($RAID)</h2>
             <p className="font-ui text-raidText/80">
@@ -476,7 +478,7 @@ export default function AboutTheGame() {
           </div>
         </section>
 
-        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-10 space-y-6 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
+        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-6 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
           <h2 className="font-pixel text-raidLime text-3xl">13. Lore Snapshot</h2>
           <blockquote className="bg-black/40 border border-raidLime/40 rounded-xl p-6 font-pixel text-xl text-raidLime leading-relaxed">
             “In the ashes of broken blockchains, the last of humanity fights for what remains — Vitality, the power to exist.
@@ -488,7 +490,7 @@ export default function AboutTheGame() {
           </p>
         </section>
 
-        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-10 space-y-6 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
+        <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-6 shadow-xl shadow-raidMagenta/10 backdrop-blur-lg">
           <h2 className="font-pixel text-raidLime text-3xl">14. Conclusion</h2>
           <p className="font-ui text-raidText/80">
             Blockchain Raiders: Battle for Vitality isn’t a casino — it’s an evolving PvP RPG that rewards strategy, progression, and courage. With Solana at its core, the game fuses competitive battles, Relic-based customization, and provable fairness into a seamless browser experience.
