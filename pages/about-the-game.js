@@ -174,7 +174,7 @@ export default function AboutTheGame() {
           <div className="inline-flex items-center gap-3 rounded-full border border-raidMagenta/60 bg-black/70 px-4 sm:px-5 py-2 font-pixel text-raidLime text-[0.65rem] sm:text-xs tracking-[0.3em] uppercase">
             ⚔️ Blockchain Raiders: Battle for Vitality
           </div>
-          <h1 className="font-pixel text-3xl sm:text-4xl md:text-6xl text-white lore-glow">Play. Plunder. Vitality.</h1>
+          <h1 className="font-pixel text-4xl sm:text-5xl md:text-6xl text-white lore-glow">Play. Plunder. Vitality.</h1>
           <p className="font-ui text-sm sm:text-base md:text-lg text-raidText/80 max-w-3xl mx-auto">
             A browser-based PvP RPG built on Solana where customizable warriors clash in real-time battles, hunt Relics of the old world, and fight for fragments of Vitality.
           </p>
@@ -187,7 +187,7 @@ export default function AboutTheGame() {
         <section className="bg-black/60 border border-raidMagenta/30 rounded-2xl shadow-xl shadow-raidMagenta/10 backdrop-blur-lg overflow-hidden">
           <div className="grid md:grid-cols-[3fr_2fr] gap-0">
             <div className="p-6 sm:p-8 lg:p-10 space-y-6">
-              <h2 className="font-pixel text-raidLime text-3xl">1. Intro</h2>
+              <h2 className="font-pixel text-raidLime text-3xl">1. Introduction</h2>
               <p className="font-ui text-raidText/85">
                 In the aftermath of a fallen digital world, the last survivors — the Raiders — battle for fragments of Vitality, the energy that sustains existence on the chain.
               </p>
