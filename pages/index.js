@@ -1,13 +1,10 @@
 // pages/index.js
 import Head from 'next/head';
 import Image from 'next/image';
-import PepeDuelClash from '@/components/PepeDuelClash';
 import { useEffect, useRef, useState } from 'react';
 import HeaderLogo from '@/components/HeaderLogo';
-import Countdown from '@/components/Countdown';
 import ReadyRaidButton from '@/components/ReadyRaidButton';
 import Topbar from '@/components/Topbar';
-import ModesRail from '@/components/ModesRail';
 import Divider from '@/components/Divider';
 
 // ===== Shared Step-style Tile (custom corner color & image size) =====
@@ -108,27 +105,6 @@ export default function Home() {
     'A fully web-native, provably-fair PvP experience on Solana. Play. Plunder. Vitality.';
   const ogImage = `${siteUrl}/og.jpg`;
 
-  // ---------- HYDRATION-SAFE: client-only countdown target ----------
-const [mounted, setMounted] = useState(false);
-const [countTarget, setCountTarget] = useState(null);
-
-useEffect(() => {
-  setMounted(true);
-
-  // 1. Create date 14 days from now
-  const now = new Date();
-  const target = new Date(now);
-  target.setDate(target.getDate() + 14);
-
-  // 2. Set to 23:00 UK time (GMT, no DST offset)
-  // new Date() always uses local timezone, so we convert manually
-  const utcHour = 23 - target.getTimezoneOffset() / 60; // adjust to actual UTC hour
-  target.setUTCHours(utcHour, 0, 0, 0);
-
-  // 3. Save numeric timestamp (not ISO) to avoid timezone shift
-  setCountTarget(target.getTime());
-}, []);
-
   // ---------- HYDRATION-SAFE: fairness demo values generated after mount ----------
   const randHex = (n) =>
     Array.from({ length: n }, () =>
@@ -217,8 +193,7 @@ useEffect(() => {
     </p>
   </div>
 
-{/* Countdown / Address / CTA panel */}
-{mounted && countTarget && (
+  {/* Hero CTA panel */}
   <div
     className="
       flex flex-col items-center gap-6
@@ -240,19 +215,18 @@ useEffect(() => {
       </span>
     </div>
 
-    {/* Countdown */}
-    <div className="flex flex-col items-center gap-2">
-      <span className="block font-pixel text-raidLime text-lg md:text-xl tracking-tight">
-        RELIC COLLECTION DROP (NFTs)
-      </span>
-      <Countdown target={countTarget} />
-    </div>
-
     {/* CTA */}
     <ReadyRaidButton />
   </div>
-)}
 
+  <div className="text-center max-w-2xl">
+    <p className="font-pixel text-raidLime text-sm md:text-base tracking-tight">
+      GET READY TO RAID
+    </p>
+    <p className="font-ui text-raidText/80 text-sm md:text-base mt-2">
+      Sign up with email and password, deposit your $RAID tokens, then select the stake that fits your strategy.
+    </p>
+  </div>
 
   {/* Tagline + Scroll hint */}
   <div className="flex flex-col items-center gap-4" aria-hidden="true">
@@ -297,18 +271,18 @@ useEffect(() => {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 {
-                  title: 'Connect Wallet',
-                  subtitle: 'Link your Solana wallet.',
+                  title: 'Create Your Account',
+                  subtitle: 'Sign up with your email and password.',
                   img: '/img/how/connectsol.png',
                 },
                 {
-                  title: 'Choose $RAID',
-                  subtitle: 'Pick your wager and mode.',
+                  title: 'Deposit $RAID',
+                  subtitle: 'Load your account with tokens.',
                   img: '/img/how/choose.png',
                 },
                 {
-                  title: 'Raid & Earn!',
-                  subtitle: 'Play. Plunder. Vitality.',
+                  title: 'Select Your Stake',
+                  subtitle: 'Lock in the $RAID you want to raid with.',
                   img: '/img/how/win.png',
                 },
               ].map((s, idx) => (
@@ -332,259 +306,135 @@ useEffect(() => {
           </div>
         </section>
 
-      {/* GAME MODES + FAIRNESS */}
-<section
-  id="modes"
-  className="py-16 lg:py-0 lg:svh lg:min-h-screen lg:snap-start lg:flex lg:items-center"
-  aria-label="Game Modes"
->
-  <div className="w-full max-w-7xl mx-auto px-6">
-    <h2 className="font-pixel text-raidLime text-2xl mb-3 lore-glow text-center">
-      GAME MODES
-    </h2>
-    <p className="font-ui text-raidText/80 text-center mb-6">
-      PvP-first, fast, and fair.
-    </p>
-
-    {/* ModesRail: ONLY show this on desktop (lg and up),
-       because on mobile it's the huge single-mode block */}
-    <div className="hidden lg:block">
-      <ModesRail />
-    </div>
-
-  {/* MOBILE/TABLET LIST (<lg) */}
-<div className="grid grid-cols-1 gap-6 lg:hidden mt-8">
-  {[
-    {
-      title: 'Treasure Drop',
-      subtitle: 'Provably-fair Plinko',
-      img: '/img/modes/TreasureDrop.png',
-    },
-    {
-      title: 'Wheel of Fate',
-      subtitle: 'Spin. Pray.',
-      img: '/img/modes/wof.png',
-    },
-   {
-          title: 'Raid Duels',
-          subtitle: 'Provably Fair PvP',
-          img: '/img/modes/duel.png',
-        },
-    {
-      title: 'Rocket Raid',
-      subtitle: 'Ride or Rekt.',
-      img: '/img/modes/RocketRaid.png',
-    },
-    {
-      title: 'Temple Trials',
-      subtitle: 'Chain Memory.',
-      img: '/img/modes/TempleTrials.png',
-    },
-  ].map((m) => (
-    <Tile
-      key={m.title}
-      imageMax={384} // match Relic sizing
-      className="mx-auto w-full max-w-[384px]" // same card width
-      image={
-        <img
-          src={m.img}
-          alt={m.title}
-          className="w-full h-auto select-none"
-          style={{ imageRendering: 'pixelated' }}
-          draggable={false}
-        />
-      }
-      title={m.title}
-      subtitle={m.subtitle}
-    >
-      <div className="mt-2 font-pixel text-raidMagenta text-[11px] opacity-80 tracking-wide">
-        COMING SOON
-      </div>
-    </Tile>
-  ))}
-</div>
-
-
-    {/* DESKTOP GRID (lg+) */}
-    <div className="hidden lg:grid lg:grid-cols-5 gap-6 mt-8">
-      {[
-        {
-          title: 'Treasure Drop',
-          subtitle: 'Provably-fair Plinko',
-          img: '/img/modes/TreasureDrop.png',
-        },
-        {
-          title: 'Raid Duels',
-          subtitle: 'Provably-fair PvP',
-          img: '/img/modes/duel.png',
-        },
-        {
-          title: 'Wheel of Fate',
-          subtitle: 'Spin. Pray.',
-          img: '/img/modes/wof.png',
-        },
-        {
-          title: 'Rocket Raid',
-          subtitle: 'Ride or Rekt.',
-          img: '/img/modes/RocketRaid.png',
-        },
-        {
-          title: 'Temple Trials',
-          subtitle: 'Chain Memory.',
-          img: '/img/modes/TempleTrials.png',
-        },
-      ].map((m) => (
-        <Tile
-          key={m.title}
-          imageMax={384}
-          image={
-            <img
-              src={m.img}
-              alt={m.title}
-              className="w-full h-auto select-none"
-              style={{ imageRendering: 'pixelated' }}
-              draggable={false}
-            />
-          }
-          title={m.title}
-          subtitle={m.subtitle}
-        >
-          <div className="mt-2 font-pixel text-raidMagenta text-[11px] opacity-80 tracking-wide">
-            COMING SOON
-          </div>
-        </Tile>
-      ))}
-    </div>
-
-    {/* === PROVABLE FAIRNESS === */}
-    <div id="fair" className="mt-10">
-      <h3 className="font-pixel text-raidLime text-xl mb-3 lore-glow text-center">
-        PROVABLE FAIRNESS
-      </h3>
-      <p className="font-ui text-raidText/80 text-center mb-5">
-        Each result uses a committed{' '}
-        <span className="text-raidMagenta">server seed hash</span> + your
-        client seed + nonce.
-      </p>
-
-      <Tile
-        badge="HASH"
-        imageMax={680}
-        title={
-          <span className="font-mono text-raidLime text-sm">
-            Commit–Reveal Scheme
-          </span>
-        }
-        subtitle={
-          <span className="font-ui text-raidText/70">
-            Verify independently — before or after any game.
-          </span>
-        }
+      {/* PROVABLE FAIRNESS */}
+      <section
+        id="fair"
+        className="py-16 lg:py-0 lg:svh lg:min-h-screen lg:snap-start lg:flex lg:items-center"
+        aria-label="Provable Fairness"
       >
-        <div className="mt-3 mx-auto w-full max-w-3xl text-left">
-          {/* Server seed hash */}
-          <div className="grid grid-cols-12 gap-3 items-center py-2 px-3 rounded bg-black/30 border border-raidMagenta/20">
-            <div className="col-span-12 md:col-span-3 font-mono text-[11px] text-raidText/60">
-              SERVER SEED HASH
-            </div>
-            <div className="col-span-10 md:col-span-8">
-              <div
-                className="font-mono text-xs md:text-sm break-all text-raidText/90"
-                suppressHydrationWarning
-              >
-                {serverSeedHash || '—'}
+        <div className="w-full max-w-7xl mx-auto px-6">
+          <h2 className="font-pixel text-raidLime text-2xl mb-3 lore-glow text-center">
+            PROVABLE FAIRNESS
+          </h2>
+          <p className="font-ui text-raidText/80 text-center mb-5">
+            Each result uses a committed{' '}
+            <span className="text-raidMagenta">server seed hash</span> + your client seed + nonce.
+          </p>
+
+          <Tile
+            badge="HASH"
+            imageMax={680}
+            title={
+              <span className="font-mono text-raidLime text-sm">
+                Commit–Reveal Scheme
+              </span>
+            }
+            subtitle={
+              <span className="font-ui text-raidText/70">
+                Verify independently — before or after any game.
+              </span>
+            }
+          >
+            <div className="mt-3 mx-auto w-full max-w-3xl text-left">
+              {/* Server seed hash */}
+              <div className="grid grid-cols-12 gap-3 items-center py-2 px-3 rounded bg-black/30 border border-raidMagenta/20">
+                <div className="col-span-12 md:col-span-3 font-mono text-[11px] text-raidText/60">
+                  SERVER SEED HASH
+                </div>
+                <div className="col-span-10 md:col-span-8">
+                  <div
+                    className="font-mono text-xs md:text-sm break-all text-raidText/90"
+                    suppressHydrationWarning
+                  >
+                    {serverSeedHash || '—'}
+                  </div>
+                </div>
+                <div className="col-span-2 md:col-span-1 flex justify-end">
+                  <button
+                    onClick={() => serverSeedHash && copy(serverSeedHash)}
+                    disabled={!serverSeedHash}
+                    className="font-mono text-[10px] px-2 py-1 border border-raidMagenta/40 hover:border-raidMagenta/70 rounded disabled:opacity-40"
+                  >
+                    COPY
+                  </button>
+                </div>
+              </div>
+
+              {/* Client seed */}
+              <div className="grid grid-cols-12 gap-3 items-center py-2 px-3 mt-3 rounded bg-black/30 border border-raidMagenta/20">
+                <div className="col-span-12 md:col-span-3 font-mono text-[11px] text-raidText/60">
+                  CLIENT SEED
+                </div>
+                <div className="col-span-10 md:col-span-8">
+                  <div
+                    className="font-mono text-xs md:text-sm break-all text-raidText/90"
+                    suppressHydrationWarning
+                  >
+                    {clientSeed || '—'}
+                  </div>
+                </div>
+                <div className="col-span-2 md:col-span-1 flex justify-end">
+                  <button
+                    onClick={() => clientSeed && copy(clientSeed)}
+                    disabled={!clientSeed}
+                    className="font-mono text-[10px] px-2 py-1 border border-raidMagenta/40 hover:border-raidMagenta/70 rounded disabled:opacity-40"
+                  >
+                    COPY
+                  </button>
+                </div>
+              </div>
+
+              {/* Nonce */}
+              <div className="grid grid-cols-12 gap-3 items-center py-2 px-3 mt-3 rounded bg-black/30 border border-raidMagenta/20">
+                <div className="col-span-12 md:col-span-3 font-mono text-[11px] text-raidText/60">
+                  NONCE
+                </div>
+                <div className="col-span-10 md:col-span-8">
+                  <div
+                    className="font-mono text-xs md:text-sm break-all text-raidText/90"
+                    suppressHydrationWarning
+                  >
+                    {nonce || '—'}
+                  </div>
+                </div>
+                <div className="col-span-2 md:col-span-1 flex justify-end">
+                  <button
+                    onClick={() => nonce && copy(nonce)}
+                    disabled={!nonce}
+                    className="font-mono text-[10px] px-2 py-1 border border-raidMagenta/40 hover:border-raidMagenta/70 rounded disabled:opacity-40"
+                  >
+                    COPY
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                <a
+                  href="/verify"
+                  className="block text-center font-pixel px-4 py-3 border rounded border-raidLime/50 hover:border-raidLime/80 text-raidLime"
+                >
+                  VERIFY A ROUND
+                </a>
+                <a
+                  href="/how-it-works/"
+                  className="block text-center font-pixel px-4 py-3 border rounded border-raidGold/50 hover:border-raidGold/80 text-raidGold"
+                >
+                  HOW IT WORKS
+                </a>
+              </div>
+
+              {/* Mini recipe */}
+              <div className="mt-5 font-mono text-[11px] text-raidText/70">
+                <div>// Deterministic outcome (example):</div>
+                <div>H = SHA256(serverSeed)</div>
+                <div>R = HMAC_SHA256(serverSeed, clientSeed:nonce)</div>
+                <div>result = parseFloat('0x' + R.slice(0,8)) / 2^32</div>
               </div>
             </div>
-            <div className="col-span-2 md:col-span-1 flex justify-end">
-              <button
-                onClick={() =>
-                  serverSeedHash && copy(serverSeedHash)
-                }
-                disabled={!serverSeedHash}
-                className="font-mono text-[10px] px-2 py-1 border border-raidMagenta/40 hover:border-raidMagenta/70 rounded disabled:opacity-40"
-              >
-                COPY
-              </button>
-            </div>
-          </div>
-
-          {/* Client seed */}
-          <div className="grid grid-cols-12 gap-3 items-center py-2 px-3 mt-3 rounded bg-black/30 border border-raidMagenta/20">
-            <div className="col-span-12 md:col-span-3 font-mono text-[11px] text-raidText/60">
-              CLIENT SEED
-            </div>
-            <div className="col-span-10 md:col-span-8">
-              <div
-                className="font-mono text-xs md:text-sm break-all text-raidText/90"
-                suppressHydrationWarning
-              >
-                {clientSeed || '—'}
-              </div>
-            </div>
-            <div className="col-span-2 md:col-span-1 flex justify-end">
-              <button
-                onClick={() => clientSeed && copy(clientSeed)}
-                disabled={!clientSeed}
-                className="font-mono text-[10px] px-2 py-1 border border-raidMagenta/40 hover:border-raidMagenta/70 rounded disabled:opacity-40"
-              >
-                COPY
-              </button>
-            </div>
-          </div>
-
-          {/* Nonce */}
-          <div className="grid grid-cols-12 gap-3 items-center py-2 px-3 mt-3 rounded bg-black/30 border border-raidMagenta/20">
-            <div className="col-span-12 md:col-span-3 font-mono text-[11px] text-raidText/60">
-              NONCE
-            </div>
-            <div className="col-span-10 md:col-span-8">
-              <div
-                className="font-mono text-xs md:text-sm break-all text-raidText/90"
-                suppressHydrationWarning
-              >
-                {nonce || '—'}
-              </div>
-            </div>
-            <div className="col-span-2 md:col-span-1 flex justify-end">
-              <button
-                onClick={() => nonce && copy(String(nonce))}
-                disabled={!nonce}
-                className="font-mono text-[10px] px-2 py-1 border border-raidMagenta/40 hover:border-raidMagenta/70 rounded disabled:opacity-40"
-              >
-                COPY
-              </button>
-            </div>
-          </div>
-
-          {/* Verify links */}
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            <a
-              href="/verify"
-              className="block text-center font-pixel px-4 py-3 border rounded border-raidLime/50 hover:border-raidLime/80 text-raidLime"
-            >
-              VERIFY A ROUND
-            </a>
-            <a
-              href="/how-it-works/"
-              className="block text-center font-pixel px-4 py-3 border rounded border-raidGold/50 hover:border-raidGold/80 text-raidGold"
-            >
-              HOW IT WORKS
-            </a>
-          </div>
-
-          {/* Mini recipe */}
-          <div className="mt-5 font-mono text-[11px] text-raidText/70">
-            <div>// Deterministic outcome (example):</div>
-            <div>H = SHA256(serverSeed)</div>
-            <div>R = HMAC_SHA256(serverSeed, clientSeed:nonce)</div>
-            <div>result = parseFloat('0x' + R.slice(0,8)) / 2^32</div>
-          </div>
+          </Tile>
         </div>
-      </Tile>
-    </div>
-    {/* === /PROVABLE FAIRNESS === */}
-  </div>
-</section>
+      </section>
+
 
 
         <Divider />

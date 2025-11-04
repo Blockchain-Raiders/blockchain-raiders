@@ -46,6 +46,8 @@ export default function Topbar() {
 
           {/* Buttons — tiny on mobile, pink base with green hover text */}
           {[
+            { label: "ABOUT THE GAME", href: "/about-the-game" },
+            { label: "TOKENOMICS", href: "/tokenomics" },
             { label: "ROAD MAP", href: "/roadmap" },
             { label: "HOW IT WORKS", href: "/how-it-works/" },
             { label: "VERIFY A ROUND", href: "/verify" },
