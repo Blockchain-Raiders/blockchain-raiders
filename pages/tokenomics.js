@@ -234,7 +234,7 @@ export default function Tokenomics() {
           <p className="font-pixel text-raidGold text-sm uppercase tracking-[0.35em]">Total Supply: 1,000,000,000 $RAID</p>
         </section>
 
-        <section className="grid lg:grid-cols-2 gap-8">
+        <section className="space-y-8">
           <div className="bg-black/50 border border-raidGold/20 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-6 backdrop-blur">
             <div className="space-y-4">
               <h2 className="font-pixel text-raidLime text-3xl">3. Core Team Allocation</h2>
@@ -277,8 +277,7 @@ export default function Tokenomics() {
               </ul>
             </div>
           </div>
-
-          <div className="space-y-8">
+          <div className="grid lg:grid-cols-2 gap-8">
             <div className="bg-black/50 border border-raidGold/20 rounded-2xl p-6 sm:p-8 lg:p-10 space-y-4 backdrop-blur">
               <h2 className="font-pixel text-raidLime text-3xl">4. Streamflow-Locked Fund</h2>
               <p className="font-ui text-raidText/80">
