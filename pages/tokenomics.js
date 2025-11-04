@@ -244,22 +244,24 @@ export default function Tokenomics() {
               </p>
             </div>
             <div className="overflow-x-auto -mx-4 sm:mx-0">
-              <table className="min-w-full divide-y divide-raidGold/20 text-left text-sm sm:text-base">
+              <table className="min-w-full divide-y divide-raidGold/20 text-left text-sm sm:text-base table-fixed">
                 <thead className="font-pixel uppercase text-raidText/60">
                   <tr>
-                    <th className="px-4 sm:px-6 py-3">Wallet</th>
-                    <th className="px-4 sm:px-6 py-3">Amount</th>
-                    <th className="px-4 sm:px-6 py-3">Purpose</th>
+                    <th className="px-4 sm:px-6 py-3 align-top">Wallet</th>
+                    <th className="px-4 sm:px-6 py-3 align-top">Amount</th>
+                    <th className="px-4 sm:px-6 py-3 align-top md:w-1/2">Purpose</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-raidGold/10">
                   {teamAllocation.map((row) => (
                     <tr key={row.wallet} className="bg-black/40">
-                      <td className="px-4 sm:px-6 py-4 font-pixel text-raidGold text-xs sm:text-sm uppercase tracking-wide">
+                      <td className="px-4 sm:px-6 py-4 font-pixel text-raidGold text-xs sm:text-sm uppercase tracking-wide align-top">
                         {row.wallet}
                       </td>
-                      <td className="px-4 sm:px-6 py-4 font-ui text-raidText/85">{row.amount}</td>
-                      <td className="px-4 sm:px-6 py-4 font-ui text-raidText/70">{row.purpose}</td>
+                      <td className="px-4 sm:px-6 py-4 font-ui text-raidText/85 align-top">{row.amount}</td>
+                      <td className="px-4 sm:px-6 py-4 font-ui text-raidText/70 align-top whitespace-normal leading-relaxed md:w-1/2">
+                        {row.purpose}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
